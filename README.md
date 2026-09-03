@@ -2,7 +2,7 @@
 
 This tool automatically tracks Indian Mainboard IPOs on NSE & BSE every day and sends free alerts to your Telegram whenever the Grey Market Premium (**GMP**) is more than **10%**:
 * **08:00 AM IST:** Morning alert with all high-GMP IPOs, prices, last filing dates, and direct **1-Click Kite App** launcher links.
-* **02:30 PM IST:** Reminder alert highlighting high-GMP IPOs closing today before the 5:00 PM cut-off.
+* **12:30 PM IST:** Reminder alert highlighting high-GMP IPOs closing today before the 5:00 PM cut-off.
 
 ---
 
@@ -90,7 +90,7 @@ setup_windows_tasks.bat
 ```
 *(Select "Run as Administrator" if prompted)*
 
-**That’s all!** Your computer will now automatically send the alerts to your phone every morning at **08:00 AM** and **02:30 PM IST**.
+**That’s all!** Your computer will now automatically send the alerts to your phone every morning at **08:00 AM** and **12:30 PM IST**.
 
 ---
 
@@ -103,7 +103,7 @@ Want to test if messages are arriving or see live IPOs right now? Run any of the
   python main.py --run-now
   ```
 
-* **Send live 02:30 PM reminder to your phone right now:**
+* **Send live 12:30 PM reminder to your phone right now:**
   ```cmd
   python main.py --run-reminder
   ```

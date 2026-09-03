@@ -95,15 +95,15 @@ def format_morning_alert(ipos: List[Dict]) -> str:
     lines.append(f"• Kite: {BROKER_APP_LINKS['Kite']}")
     lines.append(f"• Upstox: {BROKER_APP_LINKS['Upstox']}")
     lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-    lines.append("🎁 Don't have a Zerodha Kite account yet?")
-    lines.append("Open a free demat account with Zerodha and start investing in stocks, mutual funds, and IPOs:")
-    lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
+    lines.append("🎁 Don't have a Demat Account yet? Open free & start applying:")
+    lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
+    lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
     return "\n".join(lines).strip()
 
 
 def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     """
-    Format the 2:30 PM IST Reminder message.
+    Format the 12:30 PM IST Reminder message.
     Prioritizes IPOs closing TODAY or currently OPEN.
     Returns (message_text, has_urgent_closing).
     """
@@ -112,7 +112,7 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     currently_open = [ipo for ipo in ipos if ipo.get("status", "").lower() == "open"]
 
     lines = [
-        f"⚠️ [2:30 PM] IPO REMINDER ALERT ({today_str})"
+        f"⚠️ [12:30 PM] IPO REMINDER ALERT ({today_str})"
     ]
 
     if closing_today:
@@ -128,8 +128,9 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!\n")
-        lines.append("🎁 Don't have a Zerodha Kite account? Open a free demat account to apply:")
-        lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
+        lines.append("🎁 Don't have a Demat Account yet? Open free:")
+        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
+        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
         return "\n".join(lines).strip(), True
 
     elif currently_open:
@@ -143,8 +144,9 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Plan your bidding before the closing date 5:00 PM.\n")
-        lines.append("🎁 Don't have a Zerodha Kite account? Open a free demat account to apply:")
-        lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
+        lines.append("🎁 Don't have a Demat Account yet? Open free:")
+        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
+        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
         return "\n".join(lines).strip(), False
 
     elif ipos:
@@ -200,10 +202,10 @@ def run_morning_check(dry_run: bool = False) -> Dict:
 
 def run_reminder_check(dry_run: bool = False) -> Dict:
     """
-    Execute the 2:30 PM IST Reminder Workflow.
+    Execute the 12:30 PM IST Reminder Workflow.
     Automatically checks for new Telegram subscribers and notifies admin every day.
     """
-    logger.info("Executing 2:30 PM Reminder IPO Check...")
+    logger.info("Executing 12:30 PM Reminder IPO Check...")
 
     # Check for newly joined users every day
     try:
@@ -223,7 +225,7 @@ def run_reminder_check(dry_run: bool = False) -> Dict:
         return {"status": "no_reminder_needed", "count": 0, "message": None}
 
     if dry_run:
-        print("\n--- [DRY-RUN] 2:30 PM REMINDER PREVIEW ---")
+        print("\n--- [DRY-RUN] 12:30 PM REMINDER PREVIEW ---")
         print(message)
         print("------------------------------------------\n")
         return {"status": "dry_run", "count": len(eligible_ipos), "message": message}

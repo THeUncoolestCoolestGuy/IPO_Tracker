@@ -51,14 +51,15 @@ class Config:
 
     # Schedule times (IST)
     MORNING_SCHEDULE_TIME = os.getenv("MORNING_SCHEDULE_TIME", "08:00").strip()
-    REMINDER_SCHEDULE_TIME = os.getenv("REMINDER_SCHEDULE_TIME", "14:30").strip()
+    REMINDER_SCHEDULE_TIME = os.getenv("REMINDER_SCHEDULE_TIME", "12:30").strip()
     TIMEZONE = os.getenv("TIMEZONE", "Asia/Kolkata").strip()
 
     # Behavior
     SILENT_ON_EMPTY = os.getenv("SILENT_ON_EMPTY", "true").lower() in ("true", "1", "yes")
 
-    # Referral / Demat account opening link
+    # Referral / Demat account opening links
     ZERODHA_REFERRAL_URL = os.getenv("ZERODHA_REFERRAL_URL", "https://zerodha.com/open-account?c=LJ0070").strip()
+    UPSTOX_REFERRAL_URL = os.getenv("UPSTOX_REFERRAL_URL", "https://upstox.onelink.me/0H1s/86BGGM").strip()
 
 # Ensure required directories exist
 Config.DATA_DIR.mkdir(parents=True, exist_ok=True)

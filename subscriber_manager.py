@@ -95,11 +95,11 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
                 f"🎉 Welcome to Paunwala IPO Alerts, {first or 'Investor'}!\n\n"
                 "You are now subscribed to receive daily Indian Mainboard IPO alerts:\n"
                 "• 08:00 AM IST: Morning Alert (GMP > 10%)\n"
-                "• 02:30 PM IST: Reminder Alert (IPOs closing today)\n\n"
+                "• 12:30 PM IST: Reminder Alert (IPOs closing today)\n\n"
                 "📲 You'll get direct 1-click apply links for Kite, Upstox, and Sharekhan!\n\n"
-                "🎁 Don't have a Zerodha Kite account yet?\n"
-                "Open a free demat account with Zerodha and start investing in stocks, mutual funds, and IPOs:\n"
-                f"👉 {Config.ZERODHA_REFERRAL_URL}"
+                "🎁 Don't have a Demat Account yet? Open free & start applying:\n"
+                f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}\n"
+                f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}"
             )
             try:
                 requests.post(
