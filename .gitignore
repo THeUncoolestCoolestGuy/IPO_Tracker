@@ -50,4 +50,5 @@ wheels/
 .DS_Store
 Thumbs.db
 Desktop.ini
+PyWhatKit_DB.txt
 
