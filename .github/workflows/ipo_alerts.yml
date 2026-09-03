@@ -4,8 +4,8 @@ on:
   schedule:
     # 02:30 UTC is 08:00 AM IST
     - cron: '30 2 * * *'
-    # 07:00 UTC is 12:30 PM IST
-    - cron: '0 7 * * *'
+    # 09:00 UTC is 02:30 PM IST
+    - cron: '0 9 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI anytime
 
 jobs:
@@ -47,6 +47,6 @@ jobs:
             echo "Executing Morning 8:00 AM IST Check..."
             python main.py --run-now
           else
-            echo "Executing Reminder 12:30 PM IST Check..."
+            echo "Executing Reminder 2:30 PM IST Check..."
             python main.py --run-reminder
           fi

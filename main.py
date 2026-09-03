@@ -37,7 +37,7 @@ def print_banner():
     print(" Indian Mainboard IPO & GMP Alert System (NSE / BSE)")
     print(f" Target Numbers:   {', '.join(Config.PHONE_NUMBERS)}")
     print(f" GMP Threshold:    > {Config.GMP_THRESHOLD_PERCENT}%")
-    print(f" Schedules:        08:00 AM & 12:30 PM IST")
+    print(f" Schedules:        {Config.MORNING_SCHEDULE_TIME} & {Config.REMINDER_SCHEDULE_TIME} IST")
     print(f" Channels:         {', '.join(Config.NOTIFICATION_CHANNELS)}")
     print("=" * 65 + "\n")
 
@@ -69,7 +69,7 @@ def test_notification():
     test_msg = (
         "✅ IPO Tracker Test Alert:\n"
         "Your IPO alert service is connected successfully!\n"
-        "You will receive daily updates at 8:00 AM and 12:30 PM IST when Mainboard IPO GMP > 10%."
+        "You will receive daily updates at 8:00 AM and 2:30 PM IST when Mainboard IPO GMP > 10%."
     )
     results = dispatch_alert(test_msg)
     print("\nDispatch Results:")
@@ -81,7 +81,7 @@ def test_notification():
 def main():
     parser = argparse.ArgumentParser(description="Indian Mainboard IPO & GMP Alert System")
     parser.add_argument("--run-now", action="store_true", help="Run the 8:00 AM Morning Check immediately")
-    parser.add_argument("--run-reminder", action="store_true", help="Run the 12:30 PM Reminder Check immediately")
+    parser.add_argument("--run-reminder", action="store_true", help="Run the 2:30 PM Reminder Check immediately")
     parser.add_argument("--dry-run", action="store_true", help="Preview alert message without sending paid SMS")
     parser.add_argument("--daemon", action="store_true", help="Start the continuous background scheduler daemon (IST)")
     parser.add_argument("--list", action="store_true", help="List all current Mainboard IPOs and their GMP")
@@ -97,7 +97,7 @@ def main():
         print(f"Completed with status: {res['status']} (Found {res['count']} qualifying IPOs)")
 
     elif args.run_reminder:
-        print("▶ Executing Reminder 12:30 PM IPO Check...")
+        print("▶ Executing Reminder 2:30 PM IPO Check...")
         res = run_reminder_check(dry_run=args.dry_run)
         print(f"Completed with status: {res['status']} (Found {res['count']} qualifying IPOs)")
 
@@ -116,7 +116,7 @@ def main():
         list_current_ipos()
         print("Quick Commands:")
         print("  python main.py --run-now --dry-run      : Test morning alert without sending SMS")
-        print("  python main.py --run-reminder --dry-run : Test 12:30 PM reminder without sending SMS")
+        print("  python main.py --run-reminder --dry-run : Test 2:30 PM reminder without sending SMS")
         print("  python main.py --run-now                : Run live morning alert (sends SMS/messages)")
         print("  python main.py --daemon                 : Keep running in background on this PC")
         print("  python main.py --test-notification      : Test your SMS / WhatsApp / Telegram setup\n")

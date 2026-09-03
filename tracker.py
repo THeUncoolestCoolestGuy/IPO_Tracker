@@ -88,7 +88,7 @@ def format_morning_alert(ipos: List[Dict]) -> str:
 
 def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     """
-    Format the 12:30 PM IST Reminder message.
+    Format the 2:30 PM IST Reminder message.
     Prioritizes IPOs closing TODAY or currently OPEN.
     Returns (message_text, has_urgent_closing).
     """
@@ -97,7 +97,7 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     currently_open = [ipo for ipo in ipos if ipo.get("status", "").lower() == "open"]
 
     lines = [
-        f"⚠️ [12:30 PM] IPO REMINDER ALERT ({today_str})"
+        f"⚠️ [2:30 PM] IPO REMINDER ALERT ({today_str})"
     ]
 
     if closing_today:
@@ -166,9 +166,9 @@ def run_morning_check(dry_run: bool = False) -> Dict:
 
 def run_reminder_check(dry_run: bool = False) -> Dict:
     """
-    Execute the 12:30 PM IST Reminder Workflow.
+    Execute the 2:30 PM IST Reminder Workflow.
     """
-    logger.info("Executing 12:30 PM Reminder IPO Check...")
+    logger.info("Executing 2:30 PM Reminder IPO Check...")
     eligible_ipos = get_eligible_ipos()
 
     if not eligible_ipos:
