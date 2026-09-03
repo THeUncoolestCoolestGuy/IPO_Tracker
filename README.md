@@ -6,26 +6,29 @@ This tool automatically tracks Indian Mainboard IPOs on NSE & BSE every day and 
 
 ---
 
-## 📱 1-Click Kite App Quick Apply (New Feature!)
+## 📱 1-Click Broker App Quick Apply (Kite, Upstox & Sharekhan)
 
-Every alert for open IPOs includes a direct **1-Click Kite App** launcher:
+Every alert for open IPOs includes direct app launcher links for top brokers:
 ```text
 3. Deepa Jewellers
    • GMP: ₹28 (+15.8%)
    • Price: ₹177
    • Last Filing Date: 3 Sept ⚠️ (CLOSING TODAY!)
    • Status: OPEN
-   👉 Open Kite App: https://play.google.com/store/apps/details?id=com.zerodha.kite3
+   📲 Open App to Apply:
+   • Kite: https://play.google.com/store/apps/details?id=com.zerodha.kite3
+   • Upstox: https://play.google.com/store/apps/details?id=in.upstox.app
+   • Sharekhan: https://play.google.com/store/apps/details?id=com.sharekhan.androidsharemobile
 ```
 
 ### How to apply in 15 seconds:
-1. Tap **`👉 Open Kite App`** right inside your Telegram message.
+1. Tap your preferred broker's link (**Kite**, **Upstox**, or **Sharekhan**) right inside your Telegram alert.
 2. Tap the green **`[ Open ]`** button.
-3. Your native **Kite app opens instantly** with your fingerprint / biometric unlock ready.
-4. Tap **Bids** (at the bottom) ➔ **IPO** ➔ Tap **Apply** and submit your bid!
+3. Your native broker app **launches instantly** with your fingerprint / biometric unlock ready.
+4. Navigate to the **IPO** section, select the IPO, enter your UPI ID, and submit your bid!
 5. Approve the UPI mandate in Google Pay / PhonePe.
 
-*(This keeps your Kite password 100% private, avoids any browser re-login, and takes under 20 seconds).*
+*(This keeps your passwords 100% private, avoids browser re-login, and takes under 20 seconds).*
 
 ---
 

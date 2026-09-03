@@ -20,6 +20,12 @@ if hasattr(sys.stdout, "reconfigure"):
 
 logger = logging.getLogger("ipo_tracker.tracker")
 
+BROKER_APP_LINKS = {
+    "Kite": "https://play.google.com/store/apps/details?id=com.zerodha.kite3",
+    "Upstox": "https://play.google.com/store/apps/details?id=in.upstox.app",
+    "Sharekhan": "https://play.google.com/store/apps/details?id=com.sharekhan.androidsharemobile"
+}
+
 
 def get_eligible_ipos(threshold: float = None) -> List[Dict]:
     """
@@ -77,12 +83,18 @@ def format_morning_alert(ipos: List[Dict]) -> str:
         lines.append(f"   • Last Filing Date: {last_date}{closing_note}")
         lines.append(f"   • Status: {status}")
         if ipo.get("status", "").lower() == "open":
-            lines.append("   👉 Open Kite App: https://play.google.com/store/apps/details?id=com.zerodha.kite3\n")
+            lines.append("   📲 Open App to Apply:")
+            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
+            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         else:
             lines.append("")
 
-    lines.append("Apply via ASBA/UPI before 5:00 PM on the closing date.")
-    lines.append("📱 Open Kite: https://play.google.com/store/apps/details?id=com.zerodha.kite3")
+    lines.append("Apply via ASBA/UPI before 5:00 PM on the closing date.\n")
+    lines.append("📲 Direct Broker Launchers:")
+    lines.append(f"• Kite: {BROKER_APP_LINKS['Kite']}")
+    lines.append(f"• Upstox: {BROKER_APP_LINKS['Upstox']}")
+    lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}")
     return "\n".join(lines).strip()
 
 
@@ -108,7 +120,10 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
             lines.append(f" • {name}: GMP {gmp_rs} ({gmp_pct}) | Price: {ipo['price_band']}")
             lines.append(f"   Last Filing Cut-off: TODAY 5:00 PM IST")
-            lines.append(f"   👉 Open Kite App: https://play.google.com/store/apps/details?id=com.zerodha.kite3\n")
+            lines.append("   📲 Open App to Apply:")
+            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
+            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!")
         return "\n".join(lines).strip(), True
 
@@ -118,7 +133,10 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             name = ipo['name']
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
             lines.append(f" • {name}: GMP {gmp_pct} | Last Filing Date: {ipo['last_filing_date']}")
-            lines.append(f"   👉 Open Kite App: https://play.google.com/store/apps/details?id=com.zerodha.kite3\n")
+            lines.append("   📲 Open App to Apply:")
+            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
+            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Plan your bidding before the closing date 5:00 PM.")
         return "\n".join(lines).strip(), False
 
