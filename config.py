@@ -57,6 +57,9 @@ class Config:
     # Behavior
     SILENT_ON_EMPTY = os.getenv("SILENT_ON_EMPTY", "true").lower() in ("true", "1", "yes")
 
+    # Referral / Demat account opening link
+    ZERODHA_REFERRAL_URL = os.getenv("ZERODHA_REFERRAL_URL", "https://zerodha.com/open-account?c=LJ0070").strip()
+
 # Ensure required directories exist
 Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
 Config.LOGS_DIR.mkdir(parents=True, exist_ok=True)

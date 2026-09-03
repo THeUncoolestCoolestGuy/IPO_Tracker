@@ -94,7 +94,10 @@ def format_morning_alert(ipos: List[Dict]) -> str:
     lines.append("📲 Direct Broker Launchers:")
     lines.append(f"• Kite: {BROKER_APP_LINKS['Kite']}")
     lines.append(f"• Upstox: {BROKER_APP_LINKS['Upstox']}")
-    lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}")
+    lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
+    lines.append("🎁 Don't have a Zerodha Kite account yet?")
+    lines.append("Open a free demat account with Zerodha and start investing in stocks, mutual funds, and IPOs:")
+    lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
     return "\n".join(lines).strip()
 
 
@@ -124,7 +127,9 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-        lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!")
+        lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!\n")
+        lines.append("🎁 Don't have a Zerodha Kite account? Open a free demat account to apply:")
+        lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
         return "\n".join(lines).strip(), True
 
     elif currently_open:
@@ -137,7 +142,9 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-        lines.append("Plan your bidding before the closing date 5:00 PM.")
+        lines.append("Plan your bidding before the closing date 5:00 PM.\n")
+        lines.append("🎁 Don't have a Zerodha Kite account? Open a free demat account to apply:")
+        lines.append(f"👉 {Config.ZERODHA_REFERRAL_URL}")
         return "\n".join(lines).strip(), False
 
     elif ipos:
