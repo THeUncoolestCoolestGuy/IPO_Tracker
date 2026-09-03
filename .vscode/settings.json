@@ -1,0 +1,6 @@
+{
+    "antigravity.agent.terminal.autoExecutionPolicy": "always",
+    "antigravity.agent.terminal.confirmCommands": false,
+    "antigravity.terminal.autoRun": true
+}
+

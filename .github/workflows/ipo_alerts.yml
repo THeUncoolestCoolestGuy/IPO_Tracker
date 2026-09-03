@@ -1,0 +1,52 @@
+name: Indian IPO Tracker & GMP Alerts
+
+on:
+  schedule:
+    # 02:30 UTC is 08:00 AM IST
+    - cron: '30 2 * * *'
+    # 07:00 UTC is 12:30 PM IST
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
+
+jobs:
+  check-and-alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run IPO Alert Check
+        env:
+          PHONE_NUMBERS: ${{ secrets.PHONE_NUMBERS }}
+          GMP_THRESHOLD_PERCENT: ${{ secrets.GMP_THRESHOLD_PERCENT || '10.0' }}
+          NOTIFICATION_CHANNELS: ${{ secrets.NOTIFICATION_CHANNELS || 'console,telegram' }}
+          FAST2SMS_API_KEY: ${{ secrets.FAST2SMS_API_KEY }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+          TWILIO_WHATSAPP_NUMBER: ${{ secrets.TWILIO_WHATSAPP_NUMBER }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
+          SILENT_ON_EMPTY: 'true'
+        run: |
+          # Determine if this is the morning run or reminder run based on UTC hour
+          HOUR=$(date -u +%H)
+          if [ "$HOUR" -lt 5 ]; then
+            echo "Executing Morning 8:00 AM IST Check..."
+            python main.py --run-now
+          else
+            echo "Executing Reminder 12:30 PM IST Check..."
+            python main.py --run-reminder
+          fi
