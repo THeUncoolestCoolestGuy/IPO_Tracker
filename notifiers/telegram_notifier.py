@@ -32,7 +32,14 @@ class TelegramNotifier(BaseNotifier):
                 "error": "TELEGRAM_BOT_TOKEN is missing in .env"
             }
 
-        target_ids = self.chat_ids if self.chat_ids else recipients
+        # Dynamically fetch all active subscribers and auto-detect new users
+        try:
+            from subscriber_manager import get_all_active_chat_ids
+            target_ids = get_all_active_chat_ids()
+        except Exception as e:
+            logger.warning(f"Could not load subscriber registry: {e}. Using fallback IDs.")
+            target_ids = self.chat_ids if self.chat_ids else recipients
+
         if not target_ids:
             return {
                 "channel": self.name,

@@ -113,6 +113,11 @@ Want to test if messages are arriving or see live IPOs right now? Run any of the
   python main.py --list
   ```
 
+* **Check newly joined Telegram users & list subscribers:**
+  ```cmd
+  python main.py --subscribers
+  ```
+
 ---
 
 ## ❓ Frequently Asked Questions

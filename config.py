@@ -42,6 +42,7 @@ class Config:
     TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     _raw_chat_ids = os.getenv("TELEGRAM_CHAT_IDS", "").strip()
     TELEGRAM_CHAT_IDS = [cid.strip() for cid in _raw_chat_ids.split(",") if cid.strip()]
+    ADMIN_CHAT_ID = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "2056597708").strip()
 
     # WhatsApp (CallMeBot & WhatsApp Web)
     CALLMEBOT_RECIPIENTS = os.getenv("CALLMEBOT_RECIPIENTS", "").strip()

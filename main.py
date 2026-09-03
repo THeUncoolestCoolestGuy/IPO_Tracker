@@ -86,12 +86,31 @@ def main():
     parser.add_argument("--daemon", action="store_true", help="Start the continuous background scheduler daemon (IST)")
     parser.add_argument("--list", action="store_true", help="List all current Mainboard IPOs and their GMP")
     parser.add_argument("--test-notification", action="store_true", help="Send a test message to configured channels")
+    parser.add_argument("--subscribers", action="store_true", help="Check for newly joined Telegram users and list active subscribers")
 
     args = parser.parse_args()
 
     print_banner()
 
-    if args.run_now:
+    if args.subscribers:
+        print("▶ Checking for new Telegram subscribers...")
+        from subscriber_manager import sync_new_subscribers, load_subscribers_registry
+        new_users = sync_new_subscribers(notify_admin=True)
+        if new_users:
+            print(f"🎉 Detected {len(new_users)} new user(s) and notified Admin!")
+            for u in new_users:
+                print(f"  + Added: {u['name']} (Chat ID: {u['id']})")
+        else:
+            print("No new subscribers detected.")
+
+        registry = load_subscribers_registry()
+        print(f"\n📋 Currently Enrolled Subscribers ({len(registry)}):")
+        for cid, info in registry.items():
+            role_tag = f"[{info.get('role', 'member').upper()}]"
+            print(f"  • {info.get('name', 'Unknown')} (ID: {cid}) {role_tag}")
+        print()
+
+    elif args.run_now:
         print("▶ Executing Morning 8:00 AM IPO Check...")
         res = run_morning_check(dry_run=args.dry_run)
         print(f"Completed with status: {res['status']} (Found {res['count']} qualifying IPOs)")
