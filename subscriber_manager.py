@@ -145,3 +145,4 @@ def get_all_active_chat_ids() -> List[str]:
             all_ids.add(str(cid).strip())
 
     return list(all_ids)
+

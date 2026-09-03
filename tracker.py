@@ -152,8 +152,17 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
 def run_morning_check(dry_run: bool = False) -> Dict:
     """
     Execute the 8:00 AM IST Morning Workflow.
+    Automatically checks for new Telegram subscribers and notifies admin every day.
     """
     logger.info("Executing 8:00 AM Morning IPO Check...")
+
+    # Check for newly joined users every day
+    try:
+        from subscriber_manager import sync_new_subscribers
+        sync_new_subscribers(notify_admin=True)
+    except Exception as e:
+        logger.error(f"Error syncing subscribers in morning check: {e}")
+
     eligible_ipos = get_eligible_ipos()
 
     if not eligible_ipos:
@@ -185,8 +194,17 @@ def run_morning_check(dry_run: bool = False) -> Dict:
 def run_reminder_check(dry_run: bool = False) -> Dict:
     """
     Execute the 2:30 PM IST Reminder Workflow.
+    Automatically checks for new Telegram subscribers and notifies admin every day.
     """
     logger.info("Executing 2:30 PM Reminder IPO Check...")
+
+    # Check for newly joined users every day
+    try:
+        from subscriber_manager import sync_new_subscribers
+        sync_new_subscribers(notify_admin=True)
+    except Exception as e:
+        logger.error(f"Error syncing subscribers in reminder check: {e}")
+
     eligible_ipos = get_eligible_ipos()
 
     if not eligible_ipos:
@@ -198,7 +216,7 @@ def run_reminder_check(dry_run: bool = False) -> Dict:
         return {"status": "no_reminder_needed", "count": 0, "message": None}
 
     if dry_run:
-        print("\n--- [DRY-RUN] 12:30 PM REMINDER PREVIEW ---")
+        print("\n--- [DRY-RUN] 2:30 PM REMINDER PREVIEW ---")
         print(message)
         print("------------------------------------------\n")
         return {"status": "dry_run", "count": len(eligible_ipos), "message": message}
