@@ -76,3 +76,4 @@ class CallMeBotNotifier(BaseNotifier):
             "delivered": delivered,
             "failed": failed
         }
+

@@ -101,3 +101,4 @@ class WhatsAppWebNotifier(BaseNotifier):
             "delivered": delivered,
             "failed": failed
         }
+
