@@ -43,9 +43,14 @@ class Config:
     _raw_chat_ids = os.getenv("TELEGRAM_CHAT_IDS", "").strip()
     TELEGRAM_CHAT_IDS = [cid.strip() for cid in _raw_chat_ids.split(",") if cid.strip()]
 
+    # WhatsApp (CallMeBot & WhatsApp Web)
+    CALLMEBOT_RECIPIENTS = os.getenv("CALLMEBOT_RECIPIENTS", "").strip()
+    _raw_wa_phones = os.getenv("WHATSAPP_PHONE_NUMBERS", "").strip()
+    WHATSAPP_PHONE_NUMBERS = [p.strip() for p in _raw_wa_phones.split(",") if p.strip()]
+
     # Schedule times (IST)
     MORNING_SCHEDULE_TIME = os.getenv("MORNING_SCHEDULE_TIME", "08:00").strip()
-    REMINDER_SCHEDULE_TIME = os.getenv("REMINDER_SCHEDULE_TIME", "12:30").strip()
+    REMINDER_SCHEDULE_TIME = os.getenv("REMINDER_SCHEDULE_TIME", "14:30").strip()
     TIMEZONE = os.getenv("TIMEZONE", "Asia/Kolkata").strip()
 
     # Behavior

@@ -66,6 +66,19 @@ Copy the `IPO_Tracker` folder to your new computer (for example, at `D:\IPO_Trac
    ```
    *Your phone is now connected! You will receive a confirmation welcome message on Telegram.*
 
+---
+
+### Step 4B: Link Your WhatsApp (Optional)
+To receive alerts on WhatsApp as well as Telegram:
+Run the WhatsApp setup assistant in your terminal:
+```cmd
+python setup_whatsapp.py
+```
+* **Option 1 (CallMeBot):** 100% Free & runs 24/7 in GitHub Actions cloud.
+* **Option 2 (WhatsApp Web):** Automatically sends messages from your personal WhatsApp Web on your PC.
+
+*(You can enable both simultaneously!)*
+
 *(Note: If a friend or family member also wants alerts on their phone, have them tap the same link and click START, then run the command again).*
 
 ---

@@ -10,6 +10,8 @@ from .console import ConsoleNotifier
 from .fast2sms import Fast2SMSNotifier
 from .twilio_notifier import TwilioNotifier
 from .telegram_notifier import TelegramNotifier
+from .callmebot_notifier import CallMeBotNotifier
+from .whatsapp_web_notifier import WhatsAppWebNotifier
 
 logger = logging.getLogger("ipo_tracker.notifiers")
 
@@ -30,6 +32,10 @@ def get_configured_notifiers() -> List[BaseNotifier]:
             notifiers.append(TwilioNotifier(mode="whatsapp"))
         elif ch == "telegram":
             notifiers.append(TelegramNotifier())
+        elif ch in ("callmebot", "callmebot_whatsapp"):
+            notifiers.append(CallMeBotNotifier())
+        elif ch in ("whatsapp_web", "whatsapp"):
+            notifiers.append(WhatsAppWebNotifier())
         else:
             logger.warning(f"Unknown notification channel requested: {ch}")
 
