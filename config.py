@@ -56,6 +56,7 @@ class Config:
 
     # Behavior
     SILENT_ON_EMPTY = os.getenv("SILENT_ON_EMPTY", "true").lower() in ("true", "1", "yes")
+    SCRAPER_TIMEOUT = int(os.getenv("SCRAPER_TIMEOUT", "60"))
 
     # Referral / Demat account opening links
     ZERODHA_REFERRAL_URL = os.getenv("ZERODHA_REFERRAL_URL", "https://zerodha.com/open-account?c=LJ0070").strip()

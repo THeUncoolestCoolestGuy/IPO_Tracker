@@ -12,6 +12,7 @@ from datetime import datetime
 import requests
 import time
 from bs4 import BeautifulSoup
+from config import Config
 
 # Ensure UTF-8 output on Windows consoles
 if hasattr(sys.stdout, "reconfigure"):
@@ -103,9 +104,10 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
     }
 
     html = None
+    timeout_sec = getattr(Config, "SCRAPER_TIMEOUT", 60)
     for attempt in range(1, 4):
         try:
-            response = requests.get(url, headers=headers, timeout=35)
+            response = requests.get(url, headers=headers, timeout=timeout_sec)
             response.raise_for_status()
             html = response.text
             break
