@@ -36,6 +36,8 @@ def print_banner():
     print(banner)
     print(" Indian Mainboard IPO & GMP Alert System (NSE / BSE)")
     print(f" Target Numbers:   {', '.join(Config.PHONE_NUMBERS)}")
+    if Config.WHATSAPP_PHONE_NUMBERS:
+        print(f" WhatsApp Targets: {', '.join(Config.WHATSAPP_PHONE_NUMBERS)} (Chirag & Mita Paunwala only)")
     print(f" GMP Threshold:    > {Config.GMP_THRESHOLD_PERCENT}%")
     print(f" Schedules:        {Config.MORNING_SCHEDULE_TIME} & {Config.REMINDER_SCHEDULE_TIME} IST")
     print(f" Channels:         {', '.join(Config.NOTIFICATION_CHANNELS)}")
