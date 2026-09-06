@@ -2,10 +2,10 @@ name: Indian IPO Tracker & GMP Alerts
 
 on:
   schedule:
-    # 02:30 UTC is 08:00 AM IST
-    - cron: '30 2 * * *'
-    # 07:00 UTC is 12:30 PM IST
-    - cron: '0 7 * * *'
+    # 02:25 UTC is 07:55 AM IST (Avoids :00 and :30 peak congestion on GitHub servers)
+    - cron: '25 2 * * *'
+    # 06:55 UTC is 12:25 PM IST (Avoids :00 and :30 peak congestion on GitHub servers)
+    - cron: '55 6 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI anytime
 
 jobs:
@@ -30,6 +30,7 @@ jobs:
       - name: Run IPO Alert Check
         env:
           PHONE_NUMBERS: ${{ secrets.PHONE_NUMBERS }}
+          WHATSAPP_PHONE_NUMBERS: ${{ secrets.WHATSAPP_PHONE_NUMBERS }}
           GMP_THRESHOLD_PERCENT: ${{ secrets.GMP_THRESHOLD_PERCENT || '10.0' }}
           NOTIFICATION_CHANNELS: ${{ secrets.NOTIFICATION_CHANNELS || 'console,telegram' }}
           FAST2SMS_API_KEY: ${{ secrets.FAST2SMS_API_KEY }}
@@ -41,10 +42,20 @@ jobs:
           TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
           CALLMEBOT_RECIPIENTS: ${{ secrets.CALLMEBOT_RECIPIENTS }}
           SILENT_ON_EMPTY: 'true'
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
         run: |
-          # Determine if this is the morning run or reminder run based on UTC hour
           HOUR=$(date -u +%H)
-          if [ "$HOUR" -lt 5 ]; then
+          echo "Current UTC Hour: $HOUR"
+          echo "Triggered by Schedule: $EVENT_SCHEDULE"
+
+          # Anti-stale guard: If GitHub queues and delays the run past 11:00 UTC (4:30 PM IST),
+          # do NOT send outdated alerts after market application cut-off (5:00 PM IST).
+          if [ "$HOUR" -ge 11 ]; then
+            echo "Skipping execution: Run was delayed past 4:30 PM IST cut-off. Alert suppressed."
+            exit 0
+          fi
+
+          if [ "$EVENT_SCHEDULE" = "25 2 * * *" ] || [ "$HOUR" -lt 5 ]; then
             echo "Executing Morning 8:00 AM IST Check..."
             python main.py --run-now
           else
