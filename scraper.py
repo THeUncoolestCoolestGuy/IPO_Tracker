@@ -10,6 +10,7 @@ import logging
 from typing import List, Dict, Optional
 from datetime import datetime
 import requests
+import time
 from bs4 import BeautifulSoup
 
 # Ensure UTF-8 output on Windows consoles
@@ -101,12 +102,20 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
         "Referer": "https://www.google.com/"
     }
 
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.raise_for_status()
-        html = response.text
-    except Exception as e:
-        logger.error(f"Failed to fetch IPOWatch GMP: {e}")
+    html = None
+    for attempt in range(1, 4):
+        try:
+            response = requests.get(url, headers=headers, timeout=35)
+            response.raise_for_status()
+            html = response.text
+            break
+        except Exception as e:
+            logger.warning(f"IPOWatch fetch attempt {attempt}/3 failed: {e}. Retrying...")
+            if attempt < 3:
+                time.sleep(2)
+
+    if not html:
+        logger.error("Failed to fetch IPOWatch GMP after 3 attempts.")
         return []
 
     soup = BeautifulSoup(html, "html.parser")

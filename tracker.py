@@ -153,6 +153,10 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
         lines.append("\nUpcoming High-GMP Mainboard IPOs:")
         for ipo in ipos:
             lines.append(f" • {ipo['name']}: GMP +{ipo['gmp_percent']:.1f}% | Opens: {ipo['start_date']} | Closes: {ipo['last_filing_date']}")
+        lines.append("\nPlan your funds before bidding opens!\n")
+        lines.append("🎁 Don't have a Demat Account yet? Open free:")
+        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
+        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
         return "\n".join(lines).strip(), False
 
     return "", False
