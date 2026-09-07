@@ -7,7 +7,7 @@ import argparse
 import logging
 from config import Config
 from scraper import get_all_mainboard_ipos
-from tracker import run_morning_check, run_reminder_check
+from tracker import run_morning_check, run_reminder_check, run_allotment_check
 from scheduler import start_scheduler_daemon
 from notifiers import dispatch_alert
 
@@ -89,6 +89,7 @@ def main():
     parser.add_argument("--list", action="store_true", help="List all current Mainboard IPOs and their GMP")
     parser.add_argument("--test-notification", action="store_true", help="Send a test message to configured channels")
     parser.add_argument("--subscribers", action="store_true", help="Check for newly joined Telegram users and list active subscribers")
+    parser.add_argument("--check-allotment", action="store_true", help="Scan registrars for newly declared IPO allotments")
 
     args = parser.parse_args()
 
@@ -111,6 +112,11 @@ def main():
             role_tag = f"[{info.get('role', 'member').upper()}]"
             print(f"  • {info.get('name', 'Unknown')} (ID: {cid}) {role_tag}")
         print()
+
+    elif args.check_allotment:
+        print("▶ Checking registrars for newly declared IPO allotments...")
+        res = run_allotment_check(dry_run=args.dry_run)
+        print(f"Completed with status: {res['status']} (New allotments: {res.get('new_allotments', [])})")
 
     elif args.run_now:
         print("▶ Executing Morning 8:00 AM IPO Check...")
@@ -138,6 +144,7 @@ def main():
         print("Quick Commands:")
         print("  python main.py --run-now --dry-run      : Test morning alert without sending SMS")
         print("  python main.py --run-reminder --dry-run : Test 12:30 PM reminder without sending SMS")
+        print("  python main.py --check-allotment        : Scan registrars for newly declared IPO allotments")
         print("  python main.py --run-now                : Run live morning alert (sends SMS/messages)")
         print("  python main.py --daemon                 : Keep running in background on this PC")
         print("  python main.py --test-notification      : Test your SMS / WhatsApp / Telegram setup\n")

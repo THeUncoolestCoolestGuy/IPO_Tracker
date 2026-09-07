@@ -185,6 +185,13 @@ def run_morning_check(dry_run: bool = False) -> Dict:
     except Exception as e:
         logger.error(f"Error syncing subscribers in morning check: {e}")
 
+    # Check for newly declared IPO allotments
+    try:
+        from allotment_tracker import check_and_notify_new_allotments
+        check_and_notify_new_allotments(dry_run=dry_run)
+    except Exception as e:
+        logger.error(f"Error checking allotments in morning check: {e}")
+
     eligible_ipos = get_eligible_ipos()
 
     if not eligible_ipos:
@@ -227,6 +234,13 @@ def run_reminder_check(dry_run: bool = False) -> Dict:
     except Exception as e:
         logger.error(f"Error syncing subscribers in reminder check: {e}")
 
+    # Check for newly declared IPO allotments
+    try:
+        from allotment_tracker import check_and_notify_new_allotments
+        check_and_notify_new_allotments(dry_run=dry_run)
+    except Exception as e:
+        logger.error(f"Error checking allotments in reminder check: {e}")
+
     eligible_ipos = get_eligible_ipos()
 
     if not eligible_ipos:
@@ -250,3 +264,12 @@ def run_reminder_check(dry_run: bool = False) -> Dict:
         "message": message,
         "results": dispatch_results
     }
+
+
+def run_allotment_check(dry_run: bool = False, force: bool = False) -> Dict:
+    """
+    Dedicated check for newly declared IPO allotments across Link Intime, KFintech, and Bigshare.
+    """
+    logger.info("Executing on-demand IPO Allotment Check across registrars...")
+    from allotment_tracker import check_and_notify_new_allotments
+    return check_and_notify_new_allotments(dry_run=dry_run, force_check=force)

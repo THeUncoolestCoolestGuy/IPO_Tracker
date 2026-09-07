@@ -1,12 +1,29 @@
 name: Indian IPO Tracker & GMP Alerts
 
 on:
+  # 1. Instant External Webhooks (cron-job.org / curl / API) - 0 queue delay
+  repository_dispatch:
+    types: [morning_check, reminder_check, allotment_check]
+
+  # 2. Manual trigger from GitHub UI anytime
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: 'Type of check to run'
+        required: true
+        default: 'morning'
+        type: choice
+        options:
+          - morning
+          - reminder
+          - allotment
+
+  # 3. Built-in GitHub Cron (as secondary fallback)
   schedule:
-    # 02:25 UTC is 07:55 AM IST (Avoids :00 and :30 peak congestion on GitHub servers)
+    # 02:25 UTC is 07:55 AM IST
     - cron: '25 2 * * *'
-    # 06:55 UTC is 12:25 PM IST (Avoids :00 and :30 peak congestion on GitHub servers)
+    # 06:55 UTC is 12:25 PM IST
     - cron: '55 6 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
 
 jobs:
   check-and-alert:
@@ -46,23 +63,63 @@ jobs:
           UPSTOX_REFERRAL_URL: ${{ secrets.UPSTOX_REFERRAL_URL || 'https://upstox.onelink.me/0H1s/86BGGM' }}
           GROWW_REFERRAL_URL: ${{ secrets.GROWW_REFERRAL_URL || 'https://app.groww.in/v3cO/r30uflbm' }}
           GROWW_REFERRAL_CODE: ${{ secrets.GROWW_REFERRAL_CODE || '4ABMY9' }}
-          EVENT_SCHEDULE: ${{ github.event.schedule }}
         run: |
-          HOUR=$(date -u +%H)
-          echo "Current UTC Hour: $HOUR"
-          echo "Triggered by Schedule: $EVENT_SCHEDULE"
+          EVENT_NAME="${{ github.event_name }}"
+          EVENT_ACTION="${{ github.event.action }}"
+          CHECK_TYPE="${{ github.event.inputs.check_type }}"
 
-          # Anti-stale guard: If GitHub queues and delays the run past 11:00 UTC (4:30 PM IST),
-          # do NOT send outdated alerts after market application cut-off (5:00 PM IST).
-          if [ "$HOUR" -ge 11 ]; then
-            echo "Skipping execution: Run was delayed past 4:30 PM IST cut-off. Alert suppressed."
-            exit 0
-          fi
+          echo "Trigger Event: $EVENT_NAME"
+          echo "Event Action: $EVENT_ACTION"
+          echo "Input Check Type: $CHECK_TYPE"
 
-          if [ "$EVENT_SCHEDULE" = "25 2 * * *" ] || [ "$HOUR" -lt 5 ]; then
-            echo "Executing Morning 8:00 AM IST Check..."
-            python main.py --run-now
+          # PATH 1: Triggered via external Webhook (cron-job.org)
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            if [ "$EVENT_ACTION" = "reminder_check" ]; then
+              echo "🚀 Executing 12:30 PM Reminder Check (via Webhook)..."
+              python main.py --run-reminder
+            elif [ "$EVENT_ACTION" = "allotment_check" ]; then
+              echo "🚀 Executing Allotment Check (via Webhook)..."
+              python main.py --check-allotment
+            else
+              echo "🚀 Executing 8:00 AM Morning Check (via Webhook)..."
+              python main.py --run-now
+            fi
+
+          # PATH 2: Triggered manually from GitHub Web UI
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ "$CHECK_TYPE" = "reminder" ]; then
+              echo "▶ Executing Reminder Check (Manual Trigger)..."
+              python main.py --run-reminder
+            elif [ "$CHECK_TYPE" = "allotment" ]; then
+              echo "▶ Executing Allotment Check (Manual Trigger)..."
+              python main.py --check-allotment
+            else
+              echo "▶ Executing Morning Check (Manual Trigger)..."
+              python main.py --run-now
+            fi
+
+          # PATH 3: Triggered by GitHub Cron (Strict 30-minute validity window)
+          elif [ "$EVENT_NAME" = "schedule" ]; then
+            HOUR=$(date -u +%H)
+            MIN=$(date -u +%M)
+            TOTAL_MIN=$((10#$HOUR * 60 + 10#$MIN))
+            echo "Current UTC Time: $HOUR:$MIN ($TOTAL_MIN min past 00:00 UTC)"
+
+            # Morning window: 02:20 UTC to 03:15 UTC (7:50 AM to 8:45 AM IST)
+            if [ "$TOTAL_MIN" -ge 140 ] && [ "$TOTAL_MIN" -le 195 ]; then
+              echo "⏰ Executing Scheduled Morning 8:00 AM IST Check..."
+              python main.py --run-now
+            # Reminder window: 06:50 UTC to 07:45 UTC (12:20 PM to 1:15 PM IST)
+            elif [ "$TOTAL_MIN" -ge 410 ] && [ "$TOTAL_MIN" -le 465 ]; then
+              echo "⏰ Executing Scheduled Reminder 12:30 PM IST Check..."
+              python main.py --run-reminder
+            else
+              echo "⚠️ SKIPPING: GitHub Actions runner queue delay exceeded 30 minutes."
+              echo "Stale alert suppressed to prevent delayed notifications."
+              exit 0
+            fi
+
           else
-            echo "Executing Reminder 12:30 PM IST Check..."
-            python main.py --run-reminder
+            echo "Unknown trigger. Running default morning check..."
+            python main.py --run-now
           fi
