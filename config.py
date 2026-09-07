@@ -61,6 +61,8 @@ class Config:
     # Referral / Demat account opening links
     ZERODHA_REFERRAL_URL = os.getenv("ZERODHA_REFERRAL_URL", "https://zerodha.com/open-account?c=LJ0070").strip()
     UPSTOX_REFERRAL_URL = os.getenv("UPSTOX_REFERRAL_URL", "https://upstox.onelink.me/0H1s/86BGGM").strip()
+    GROWW_REFERRAL_URL = os.getenv("GROWW_REFERRAL_URL", "https://app.groww.in/v3cO/r30uflbm").strip()
+    GROWW_REFERRAL_CODE = os.getenv("GROWW_REFERRAL_CODE", "4ABMY9").strip()
 
 # Ensure required directories exist
 Config.DATA_DIR.mkdir(parents=True, exist_ok=True)

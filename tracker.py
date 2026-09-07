@@ -23,6 +23,7 @@ logger = logging.getLogger("ipo_tracker.tracker")
 BROKER_APP_LINKS = {
     "Kite": "https://play.google.com/store/apps/details?id=com.zerodha.kite3",
     "Upstox": "https://play.google.com/store/apps/details?id=in.upstox.app",
+    "Groww": "https://play.google.com/store/apps/details?id=com.nextbillion.groww",
     "Sharekhan": "https://play.google.com/store/apps/details?id=com.sharekhan.androidsharemobile"
 }
 
@@ -86,6 +87,7 @@ def format_morning_alert(ipos: List[Dict]) -> str:
             lines.append("   📲 Open App to Apply:")
             lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         else:
             lines.append("")
@@ -94,10 +96,12 @@ def format_morning_alert(ipos: List[Dict]) -> str:
     lines.append("📲 Direct Broker Launchers:")
     lines.append(f"• Kite: {BROKER_APP_LINKS['Kite']}")
     lines.append(f"• Upstox: {BROKER_APP_LINKS['Upstox']}")
+    lines.append(f"• Groww: {BROKER_APP_LINKS['Groww']}")
     lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
     lines.append("🎁 Don't have a Demat Account yet? Open free & start applying:")
     lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
     lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
+    lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
     return "\n".join(lines).strip()
 
 
@@ -126,11 +130,13 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append("   📲 Open App to Apply:")
             lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!\n")
         lines.append("🎁 Don't have a Demat Account yet? Open free:")
         lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
         lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
+        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
         return "\n".join(lines).strip(), True
 
     elif currently_open:
@@ -142,11 +148,13 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             lines.append("   📲 Open App to Apply:")
             lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
             lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
+            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
             lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
         lines.append("Plan your bidding before the closing date 5:00 PM.\n")
         lines.append("🎁 Don't have a Demat Account yet? Open free:")
         lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
         lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
+        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
         return "\n".join(lines).strip(), False
 
     elif ipos:
@@ -157,6 +165,7 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
         lines.append("🎁 Don't have a Demat Account yet? Open free:")
         lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
         lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
+        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
         return "\n".join(lines).strip(), False
 
     return "", False
