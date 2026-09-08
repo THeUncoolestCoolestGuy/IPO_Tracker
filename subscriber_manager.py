@@ -15,20 +15,56 @@ logger = logging.getLogger("ipo_tracker.subscribers")
 SUBSCRIBERS_FILE = Config.DATA_DIR / "subscribers.json"
 
 
+import time
+
+def _telegram_post_with_retry(token: str, payload: Dict[str, Any], max_retries: int = 3, timeout: int = 35) -> bool:
+    """Send a POST request to Telegram sendMessage with retry and backoff."""
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    for attempt in range(1, max_retries + 1):
+        try:
+            res = requests.post(url, json=payload, timeout=timeout)
+            data = res.json()
+            if data.get("ok"):
+                return True
+            code = data.get("error_code")
+            if code in (400, 403):
+                logger.warning(f"Telegram permanent failure for {payload.get('chat_id')}: {data.get('description')}")
+                return False
+            if code == 429:
+                retry_after = data.get("parameters", {}).get("retry_after", 3)
+                time.sleep(retry_after)
+                continue
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            logger.warning(f"Telegram network issue sending to {payload.get('chat_id')} (attempt {attempt}/{max_retries}): {e}")
+        except Exception as e:
+            logger.error(f"Telegram unexpected error: {e}")
+            return False
+
+        if attempt < max_retries:
+            time.sleep(attempt * 2)
+    return False
+
+
 def load_subscribers_registry() -> Dict[str, Dict[str, Any]]:
     """Load the subscriber registry from data/subscribers.json."""
     if SUBSCRIBERS_FILE.exists():
         try:
             with open(SUBSCRIBERS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict) and data:
+                    return data
         except Exception as e:
             logger.error(f"Error loading subscribers.json: {e}")
 
-    # Default baseline with known initial subscribers
+    # Baseline with all verified subscribers
     baseline = {
         "2056597708": {"name": "The uncoolest coolest guy", "role": "admin"},
         "443423364": {"name": "Dr. Chirag Paunwala (@cpaunwala)", "role": "member"},
-        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member"}
+        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member"},
+        "424851606": {"name": "K", "role": "member"},
+        "516357277": {"name": "Paresh Bardolia", "role": "member"},
+        "1293713981": {"name": "Sarthak", "role": "member"},
+        "1400902994": {"name": "Dobby", "role": "member"}
     }
     save_subscribers_registry(baseline)
     return baseline
@@ -57,17 +93,28 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
     registry = load_subscribers_registry()
     admin_id = getattr(Config, "ADMIN_CHAT_ID", "2056597708")
     new_subscribers = []
+    max_update_id = 0
 
-    try:
-        url = f"https://api.telegram.org/bot{token}/getUpdates"
-        res = requests.get(url, timeout=10)
-        data = res.json()
-        updates = data.get("result", [])
-    except Exception as e:
-        logger.error(f"Error checking Telegram getUpdates: {e}")
-        return []
+    url = f"https://api.telegram.org/bot{token}/getUpdates"
+    updates = []
+    for attempt in range(1, 4):
+        try:
+            res = requests.get(url, timeout=30)
+            data = res.json()
+            if data.get("ok"):
+                updates = data.get("result", [])
+                break
+            else:
+                logger.warning(f"getUpdates returned error: {data.get('description')}")
+        except Exception as e:
+            logger.warning(f"Error checking Telegram getUpdates (attempt {attempt}/3): {e}")
+            time.sleep(attempt * 2)
 
     for update in updates:
+        uid = update.get("update_id", 0)
+        if uid > max_update_id:
+            max_update_id = uid
+
         msg = update.get("message") or update.get("my_chat_member") or {}
         chat = msg.get("chat") or {}
         cid = str(chat.get("id", "")).strip()
@@ -102,31 +149,25 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
                 f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}\n"
                 f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}"
             )
-            try:
-                requests.post(
-                    f"https://api.telegram.org/bot{token}/sendMessage",
-                    json={"chat_id": cid, "text": welcome_msg},
-                    timeout=10
-                )
-            except Exception as e:
-                logger.error(f"Failed to send welcome to {cid}: {e}")
+            _telegram_post_with_retry(token, {"chat_id": cid, "text": welcome_msg})
 
             # 2. Inform the Admin
-            if notify_admin and admin_id:
+            if notify_admin and admin_id and cid != admin_id:
                 admin_alert = (
                     "🔔 [ADMIN NOTIFICATION] New Subscriber Joined!\n\n"
                     f"👤 Name: {display_name}\n"
                     f"🆔 Chat ID: {cid}\n\n"
                     "✅ They have been automatically enrolled to receive daily IPO & GMP alerts!"
                 )
-                try:
-                    requests.post(
-                        f"https://api.telegram.org/bot{token}/sendMessage",
-                        json={"chat_id": admin_id, "text": admin_alert},
-                        timeout=10
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to notify admin about {cid}: {e}")
+                _telegram_post_with_retry(token, {"chat_id": admin_id, "text": admin_alert})
+
+    # Acknowledge processed updates with Telegram server so they are never returned again
+    if max_update_id > 0:
+        try:
+            requests.get(f"{url}?offset={max_update_id + 1}&limit=1", timeout=25)
+            logger.debug(f"Acknowledged Telegram updates up to {max_update_id}")
+        except Exception as e:
+            logger.debug(f"Could not acknowledge getUpdates offset {max_update_id + 1}: {e}")
 
     if new_subscribers:
         save_subscribers_registry(registry)

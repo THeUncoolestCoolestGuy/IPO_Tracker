@@ -16,6 +16,8 @@ logs/
 # ==============================================================================
 data/*.json
 !data/.gitkeep
+!data/subscribers.json
+!data/notified_allotments.json
 
 # ==============================================================================
 # PYTHON COMPILED & VIRTUAL ENVIRONMENTS

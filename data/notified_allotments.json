@@ -1,0 +1,482 @@
+{
+  "phychemtechnologies": {
+    "name": "Phychem Technologies Limited - SME IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "first_seen": "2026-09-07T18:53:59.261249"
+  },
+  "esdssoftwaresolution": {
+    "name": "ESDS Software Solution Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "first_seen": "2026-09-07T18:53:59.261262"
+  },
+  "priorityjewels": {
+    "name": "Priority Jewels Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "first_seen": "2026-09-07T18:53:59.261266"
+  },
+  "symbiotecpharmalab": {
+    "name": "Symbiotec Pharmalab Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "first_seen": "2026-09-07T18:53:59.261270"
+  },
+  "augmontenterprises": {
+    "name": "Augmont Enterprises Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "first_seen": "2026-09-07T18:53:59.261273"
+  },
+  "flyhimaritimetravels": {
+    "name": "FLY HI MARITIME TRAVELS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261276"
+  },
+  "raysofbelief": {
+    "name": "RAYS OF BELIEF LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261279"
+  },
+  "ashutoshfibre": {
+    "name": "ASHUTOSH FIBRE LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261284"
+  },
+  "shantiinorganics": {
+    "name": "SHANTI INORGANICS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261287"
+  },
+  "purplestylelabs": {
+    "name": "PURPLE STYLE LABS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261290"
+  },
+  "annuprojects": {
+    "name": "ANNU PROJECTS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261292"
+  },
+  "sumaxengineering": {
+    "name": "SUMAX ENGINEERING LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261295"
+  },
+  "tempsensinstrumentsindia": {
+    "name": "TEMPSENS INSTRUMENTS (INDIA) LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261298"
+  },
+  "shankeshjewellers": {
+    "name": "SHANKESH JEWELLERS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261300"
+  },
+  "horizonindustrialparks": {
+    "name": "HORIZON INDUSTRIAL PARKS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261303"
+  },
+  "chemmanurcreditsandinvestmentsaugust2026": {
+    "name": "CHEMMANUR CREDITS AND INVESTMENTS LIMITED AUGUST2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261306"
+  },
+  "credentconnectncare": {
+    "name": "CREDENT CONNECT N CARE LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261309"
+  },
+  "shiprocket": {
+    "name": "SHIPROCKET LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261311"
+  },
+  "milkymistdairyfood": {
+    "name": "MILKY MIST DAIRY FOOD LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261314"
+  },
+  "molbiodiagnostics": {
+    "name": "MOLBIO DIAGNOSTICS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261316"
+  },
+  "dhoottransmission": {
+    "name": "DHOOT TRANSMISSION LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261319"
+  },
+  "ardeeindustries": {
+    "name": "ARDEE INDUSTRIES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261321"
+  },
+  "mvelectrosystems": {
+    "name": "MV ELECTROSYSTEMS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261324"
+  },
+  "junipergreenenergy": {
+    "name": "JUNIPER GREEN ENERGY LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261327"
+  },
+  "dhavalpackaging": {
+    "name": "DHAVAL PACKAGING LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261329"
+  },
+  "manipalhealthenterprises": {
+    "name": "MANIPAL HEALTH ENTERPRISES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261332"
+  },
+  "advancetechnoforg": {
+    "name": "ADVANCE TECHNOFORG LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261338"
+  },
+  "cubehighwaystrustinvit": {
+    "name": "CUBE HIGHWAYS TRUST - INVIT",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261341"
+  },
+  "xtranettechnologies": {
+    "name": "XTRANET TECHNOLOGIES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261343"
+  },
+  "shreebalajimalatextiles": {
+    "name": "SHREE BALAJI MALA TEXTILES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261346"
+  },
+  "gulflloydsindia": {
+    "name": "GULF LLOYDS INDIA LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261348"
+  },
+  "caliberminingandlogistics": {
+    "name": "CALIBER MINING AND LOGISTICS LIMITED IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261352"
+  },
+  "sbifundsmanagment": {
+    "name": "SBI FUNDS MANAGMENT LIMITED IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261355"
+  },
+  "alpinetexworld": {
+    "name": "ALPINE TEXWORLD LIMITED IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261357"
+  },
+  "kratikaltech": {
+    "name": "KRATIKAL TECH LIMITED SME",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261360"
+  },
+  "tejaengineeringindustries": {
+    "name": "TEJA ENGINEERING INDUSTRIES LIMITED SME IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261363"
+  },
+  "adonagrocommodities": {
+    "name": "ADON AGRO COMMODITIES LIMITED SME IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261366"
+  },
+  "crazysnacks": {
+    "name": "CRAZY SNACKS LIMITED SME IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261369"
+  },
+  "csmtechnologies": {
+    "name": "CSM TECHNOLOGIES LIMITED IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261372"
+  },
+  "turtlemintfintechsolutions": {
+    "name": "TURTLEMINT FINTECH SOLUTIONS LIMITED IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261375"
+  },
+  "claycraftindia": {
+    "name": "CLAY CRAFT INDIA LIMITED SME IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261378"
+  },
+  "liotechindustries": {
+    "name": "LIOTECH INDUSTRIES LIMITED SME IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261381"
+  },
+  "prachaycapitalncdsjune2026": {
+    "name": "PRACHAY CAPITAL LIMITED NCDS JUNE 2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261384"
+  },
+  "horizonreclaimindia": {
+    "name": "HORIZON RECLAIM INDIA LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261387"
+  },
+  "edelweissfinancialservicesncd18june2026": {
+    "name": "EDELWEISS FINANCIAL SERVICES LTD NCD18 JUNE 2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261390"
+  },
+  "muthootmercantilejune2026": {
+    "name": "MUTHOOT MERCANTILE LIMITED - JUNE 2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261393"
+  },
+  "hexagonnutrition": {
+    "name": "HEXAGON NUTRITION LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261397"
+  },
+  "vahhchemicals": {
+    "name": "VAHH CHEMICALS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261399"
+  },
+  "cmrgreentechnologies": {
+    "name": "CMR GREEN TECHNOLOGIES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261402"
+  },
+  "kosamattamfinancencdsmay2026": {
+    "name": "KOSAMATTAM FINANCE LIMITED - NCDS - MAY-2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261405"
+  },
+  "teamtechformworksolutions": {
+    "name": "TEAMTECH FORMWORK SOLUTIONS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261408"
+  },
+  "rfblflexipack": {
+    "name": "RFBL FLEXI PACK LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261410"
+  },
+  "bagmaneprimeofficereit": {
+    "name": "BAGMANE PRIME OFFICE REIT",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261413"
+  },
+  "value360communications": {
+    "name": "VALUE 360 COMMUNICATIONS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261415"
+  },
+  "onemitechnologysolutions": {
+    "name": "ONEMI TECHNOLOGY SOLUTIONS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261418"
+  },
+  "adisofttechnologies": {
+    "name": "ADISOFT TECHNOLOGIES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261420"
+  },
+  "citiustransnetinvestmenttrust": {
+    "name": "CITIUS TRANSNET INVESTMENT TRUST",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261423"
+  },
+  "mehultelecom": {
+    "name": "MEHUL TELECOM LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261425"
+  },
+  "propsharecelestiasmreit2026": {
+    "name": "PROPSHARE CELESTIA SM REIT 2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261429"
+  },
+  "amirchandjagdishkumarexports": {
+    "name": "AMIR CHAND JAGDISH KUMAR (EXPORTS) LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261432"
+  },
+  "centralmineplanninganddesigninstitute": {
+    "name": "CENTRAL MINE PLANNING AND DESIGN INSTITUTE LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261435"
+  },
+  "novusloyalty": {
+    "name": "NOVUS LOYALTY LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261438"
+  },
+  "edelweissfinancialservicesncdsmarch2026": {
+    "name": "EDELWEISS FINANCIAL SERVICES LTD-NCDS-MARCH-2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261441"
+  },
+  "innovision": {
+    "name": "INNOVISION LIMITED-IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261443"
+  },
+  "raajmarginfrainvestmenttrustinvit": {
+    "name": "RAAJMARG INFRA INVESTMENT TRUST - INVIT",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261446"
+  },
+  "chemmanurcreditsandinvestmentsncds8march2026": {
+    "name": "CHEMMANUR CREDITS AND INVESTMENTS LIMITED - NCDS8 - MARCH2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261450"
+  },
+  "rajputanastainless": {
+    "name": "RAJPUTANA STAINLESS LIMITED-IPO",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261454"
+  },
+  "prachaycapitalncds3february2026": {
+    "name": "PRACHAY CAPITAL LIMITED-NCDS3-FEBRUARY-2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261457"
+  },
+  "accordtransformerandswitchgear": {
+    "name": "ACCORD TRANSFORMER AND SWITCHGEAR LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261460"
+  },
+  "fractalindustries": {
+    "name": "FRACTAL INDUSTRIES LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261462"
+  },
+  "kosamattamfinancencd36february2026": {
+    "name": "KOSAMATTAM FINANCE LIMITED - NCD36 - FEBRUARY 2026",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261465"
+  },
+  "powerfinancecorporationzerocouponncds": {
+    "name": "POWER FINANCE CORPORATION LIMITED - ZERO COUPON NCDS",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261469"
+  },
+  "powerfinancecorporationncds": {
+    "name": "POWER FINANCE CORPORATION LIMITED - NCDS",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261472"
+  },
+  "ayefinance": {
+    "name": "AYE FINANCE LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261474"
+  },
+  "accretionnutraveda": {
+    "name": "ACCRETION NUTRAVEDA LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261476"
+  },
+  "kanishkaluminiumindia": {
+    "name": "KANISHK ALUMINIUM INDIA LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "first_seen": "2026-09-07T18:53:59.261479"
+  },
+  "deepajewellers": {
+    "name": "DEEPA JEWELLERS LIMITED",
+    "registrar": "Bigshare Services",
+    "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
+    "first_seen": "2026-09-07T18:53:59.261481"
+  },
+  "farmpeace": {
+    "name": "FARM PEACE LIMITED",
+    "registrar": "Bigshare Services",
+    "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
+    "first_seen": "2026-09-07T18:53:59.261483"
+  },
+  "luminoindustries": {
+    "name": "LUMINO INDUSTRIES LIMITED",
+    "registrar": "Bigshare Services",
+    "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
+    "first_seen": "2026-09-07T18:53:59.261486"
+  },
+  "kwickforensicsolutions": {
+    "name": "KWICK FORENSIC SOLUTIONS LIMITED",
+    "registrar": "Bigshare Services",
+    "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
+    "first_seen": "2026-09-07T18:53:59.261488"
+  }
+}

@@ -28,6 +28,8 @@ on:
 jobs:
   check-and-alert:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -122,4 +124,15 @@ jobs:
           else
             echo "Unknown trigger. Running default morning check..."
             python main.py --run-now
+          fi
+
+      - name: Persist dynamic state (Subscribers & Allotments)
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/subscribers.json data/notified_allotments.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-persist dynamic state [skip ci]"
+            git push origin main || echo "State push skipped (no new changes or concurrent push)"
           fi
