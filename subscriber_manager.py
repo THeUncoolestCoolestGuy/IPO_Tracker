@@ -17,7 +17,7 @@ SUBSCRIBERS_FILE = Config.DATA_DIR / "subscribers.json"
 
 import time
 
-def _telegram_post_with_retry(token: str, payload: Dict[str, Any], max_retries: int = 3, timeout: int = 35) -> bool:
+def _telegram_post_with_retry(token: str, payload: Dict[str, Any], max_retries: int = 3, timeout: int = 60) -> bool:
     """Send a POST request to Telegram sendMessage with retry and backoff."""
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     for attempt in range(1, max_retries + 1):
@@ -99,7 +99,7 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
     updates = []
     for attempt in range(1, 4):
         try:
-            res = requests.get(url, timeout=30)
+            res = requests.get(url, timeout=60)
             data = res.json()
             if data.get("ok"):
                 updates = data.get("result", [])
@@ -164,7 +164,7 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
     # Acknowledge processed updates with Telegram server so they are never returned again
     if max_update_id > 0:
         try:
-            requests.get(f"{url}?offset={max_update_id + 1}&limit=1", timeout=25)
+            requests.get(f"{url}?offset={max_update_id + 1}&limit=1", timeout=60)
             logger.debug(f"Acknowledged Telegram updates up to {max_update_id}")
         except Exception as e:
             logger.debug(f"Could not acknowledge getUpdates offset {max_update_id + 1}: {e}")

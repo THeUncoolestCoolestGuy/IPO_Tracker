@@ -56,7 +56,7 @@ class TelegramNotifier(BaseNotifier):
         failed = []
         last_error = None
         max_retries = 3
-        timeout_seconds = 35
+        timeout_seconds = 60
 
         for chat_id in target_ids:
             payload = {

@@ -22,7 +22,7 @@ BOT_USERNAME = "PaunwalaIpoAlert_bot"
 def get_updates():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     try:
-        r = requests.get(url, timeout=10)
+        r = requests.get(url, timeout=60)
         return r.json()
     except Exception as e:
         print(f"Error checking Telegram API: {e}")
@@ -38,7 +38,7 @@ def send_welcome(chat_id, user_name):
         "• Daily 8:00 AM IST alerts when Mainboard IPO GMP > 10%\n"
         "• Daily 12:30 PM IST reminders for IPOs closing that day."
     )
-    requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=10)
+    requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=60)
 
 
 def update_env_file(chat_ids):
