@@ -90,6 +90,7 @@ def main():
     parser.add_argument("--test-notification", action="store_true", help="Send a test message to configured channels")
     parser.add_argument("--subscribers", action="store_true", help="Check for newly joined Telegram users and list active subscribers")
     parser.add_argument("--check-allotment", action="store_true", help="Scan registrars for newly declared IPO allotments")
+    parser.add_argument("--skip-if-already-dispatched", action="store_true", help="Skip if today's alert was already dispatched")
 
     args = parser.parse_args()
 
@@ -120,12 +121,12 @@ def main():
 
     elif args.run_now:
         print("▶ Executing Morning 8:00 AM IPO Check...")
-        res = run_morning_check(dry_run=args.dry_run)
+        res = run_morning_check(dry_run=args.dry_run, skip_if_already_dispatched=args.skip_if_already_dispatched)
         print(f"Completed with status: {res['status']} (Found {res['count']} qualifying IPOs)")
 
     elif args.run_reminder:
         print("▶ Executing Reminder 12:30 PM IPO Check...")
-        res = run_reminder_check(dry_run=args.dry_run)
+        res = run_reminder_check(dry_run=args.dry_run, skip_if_already_dispatched=args.skip_if_already_dispatched)
         print(f"Completed with status: {res['status']} (Found {res['count']} qualifying IPOs)")
 
     elif args.daemon:

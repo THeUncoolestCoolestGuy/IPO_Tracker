@@ -171,11 +171,53 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     return "", False
 
 
-def run_morning_check(dry_run: bool = False) -> Dict:
+import json
+
+DISPATCH_STATE_FILE = Config.DATA_DIR / "last_dispatch.json"
+
+
+def _record_dispatch(dispatch_type: str):
+    """Record the date of the successful dispatch to prevent duplicate alerts."""
+    try:
+        Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+        data = {}
+        if DISPATCH_STATE_FILE.exists():
+            try:
+                with open(DISPATCH_STATE_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                data = {}
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        data[dispatch_type] = today_str
+        with open(DISPATCH_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        logger.debug(f"Could not record dispatch state: {e}")
+
+
+def has_dispatched_today(dispatch_type: str) -> bool:
+    """Check if an alert of this type has already been dispatched today."""
+    try:
+        if DISPATCH_STATE_FILE.exists():
+            with open(DISPATCH_STATE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            return data.get(dispatch_type) == today_str
+    except Exception:
+        pass
+    return False
+
+
+def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = False) -> Dict:
     """
     Execute the 8:00 AM IST Morning Workflow.
     Automatically checks for new Telegram subscribers and notifies admin every day.
     """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    if skip_if_already_dispatched and has_dispatched_today("morning"):
+        logger.info(f"Morning alert for today ({today_str}) has already been sent. Suppressing duplicate run.")
+        return {"status": "skipped_duplicate", "count": 0, "message": "Already dispatched today"}
+
     logger.info("Executing 8:00 AM Morning IPO Check...")
 
     # Check for newly joined users every day
@@ -200,6 +242,7 @@ def run_morning_check(dry_run: bool = False) -> Dict:
             msg = f"ℹ️ [8:00 AM] IPO Update: No Mainboard IPOs currently meet the {Config.GMP_THRESHOLD_PERCENT}% GMP criteria today."
             if not dry_run:
                 dispatch_alert(msg)
+                _record_dispatch("morning")
             return {"status": "silent_empty", "count": 0, "message": msg}
         return {"status": "silent_empty", "count": 0, "message": None}
 
@@ -212,6 +255,8 @@ def run_morning_check(dry_run: bool = False) -> Dict:
         return {"status": "dry_run", "count": len(eligible_ipos), "message": message}
 
     dispatch_results = dispatch_alert(message)
+    _record_dispatch("morning")
+
     return {
         "status": "dispatched",
         "count": len(eligible_ipos),
@@ -220,11 +265,16 @@ def run_morning_check(dry_run: bool = False) -> Dict:
     }
 
 
-def run_reminder_check(dry_run: bool = False) -> Dict:
+def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool = False) -> Dict:
     """
     Execute the 12:30 PM IST Reminder Workflow.
     Automatically checks for new Telegram subscribers and notifies admin every day.
     """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    if skip_if_already_dispatched and has_dispatched_today("reminder"):
+        logger.info(f"Reminder alert for today ({today_str}) has already been sent. Suppressing duplicate run.")
+        return {"status": "skipped_duplicate", "count": 0, "message": "Already dispatched today"}
+
     logger.info("Executing 12:30 PM Reminder IPO Check...")
 
     # Check for newly joined users every day
@@ -258,6 +308,8 @@ def run_reminder_check(dry_run: bool = False) -> Dict:
         return {"status": "dry_run", "count": len(eligible_ipos), "message": message}
 
     dispatch_results = dispatch_alert(message)
+    _record_dispatch("reminder")
+
     return {
         "status": "dispatched",
         "count": len(eligible_ipos),

@@ -79,7 +79,14 @@ class TelegramNotifier(BaseNotifier):
                             f"Telegram error sending to {chat_id} (attempt {attempt}/{max_retries}, code {error_code}): {last_error}"
                         )
                         # Don't retry if user blocked bot or chat not found
-                        if error_code in (400, 403):
+                        if error_code == 403:
+                            try:
+                                from subscriber_manager import deactivate_subscriber
+                                deactivate_subscriber(chat_id, "blocked")
+                            except Exception:
+                                pass
+                            break
+                        if error_code == 400:
                             break
                         if error_code == 429:
                             retry_after = data.get("parameters", {}).get("retry_after", 3)

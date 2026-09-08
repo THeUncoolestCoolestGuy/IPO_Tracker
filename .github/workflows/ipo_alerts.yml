@@ -110,11 +110,11 @@ jobs:
             # Morning window: 02:20 UTC to 03:15 UTC (7:50 AM to 8:45 AM IST)
             if [ "$TOTAL_MIN" -ge 140 ] && [ "$TOTAL_MIN" -le 195 ]; then
               echo "⏰ Executing Scheduled Morning 8:00 AM IST Check..."
-              python main.py --run-now
+              python main.py --run-now --skip-if-already-dispatched
             # Reminder window: 06:50 UTC to 07:45 UTC (12:20 PM to 1:15 PM IST)
             elif [ "$TOTAL_MIN" -ge 410 ] && [ "$TOTAL_MIN" -le 465 ]; then
               echo "⏰ Executing Scheduled Reminder 12:30 PM IST Check..."
-              python main.py --run-reminder
+              python main.py --run-reminder --skip-if-already-dispatched
             else
               echo "⚠️ SKIPPING: GitHub Actions runner queue delay exceeded 30 minutes."
               echo "Stale alert suppressed to prevent delayed notifications."
@@ -131,7 +131,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/subscribers.json data/notified_allotments.json || true
+          git add data/subscribers.json data/notified_allotments.json data/last_dispatch.json || true
           if ! git diff --cached --quiet; then
             git commit -m "Auto-persist dynamic state [skip ci]"
             git push origin main || echo "State push skipped (no new changes or concurrent push)"

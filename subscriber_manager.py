@@ -176,18 +176,34 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
     return new_subscribers
 
 
+def deactivate_subscriber(chat_id: str, reason: str = "blocked"):
+    """Mark a subscriber as inactive / blocked so we don't attempt sending to them."""
+    cid = str(chat_id).strip()
+    registry = load_subscribers_registry()
+    if cid in registry:
+        registry[cid]["status"] = reason
+        save_subscribers_registry(registry)
+        logger.info(f"Subscriber {cid} marked as {reason}.")
+
+
 def get_all_active_chat_ids() -> List[str]:
     """
     Get all active Telegram Chat IDs combining .env and subscribers.json.
     Also runs sync to catch any newly joined users.
+    Excludes any blocked/inactive users.
     """
     sync_new_subscribers(notify_admin=True)
     registry = load_subscribers_registry()
 
-    all_ids = set(registry.keys())
-    for cid in Config.TELEGRAM_CHAT_IDS:
-        if cid:
+    all_ids = set()
+    for cid, info in registry.items():
+        if info.get("status") not in ("blocked", "inactive"):
             all_ids.add(str(cid).strip())
+
+    for cid in Config.TELEGRAM_CHAT_IDS:
+        cid_str = str(cid).strip()
+        if cid_str and registry.get(cid_str, {}).get("status") not in ("blocked", "inactive"):
+            all_ids.add(cid_str)
 
     return list(all_ids)
 
