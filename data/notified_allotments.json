@@ -478,5 +478,11 @@
     "registrar": "Bigshare Services",
     "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
     "first_seen": "2026-09-07T18:53:59.261488"
+  },
+  "qualianceinternational": {
+    "name": "Qualiance International Limited - SME IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "notified_at": "2026-09-10T02:30:44.562605"
   }
 }
