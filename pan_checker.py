@@ -179,7 +179,9 @@ def batch_check_pans(company_query: Optional[str], pans: List[str]) -> Dict[str,
     from allotment_scraper import get_kfintech_ipos
 
     target_ipo = None
-    if company_query:
+    if isinstance(company_query, dict):
+        target_ipo = company_query
+    elif company_query:
         target_ipo = find_ipo_by_name(company_query)
         if not target_ipo:
             kfin_ipos = get_kfintech_ipos()
