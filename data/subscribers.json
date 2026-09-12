@@ -4,40 +4,56 @@
     "role": "admin",
     "pans": [
       "DREPP6871C"
-    ]
+    ],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "443423364": {
     "name": "Dr. Chirag Paunwala (@cpaunwala)",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "810585239": {
     "name": "Mita Paunwala (@Mpaunwala)",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "424851606": {
     "name": "K",
     "role": "member",
-    "status": "blocked"
+    "status": "blocked",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "516357277": {
     "name": "Paresh Bardolia",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "1293713981": {
     "name": "Sarthak",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "1400902994": {
     "name": "Dobby",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "1763761508": {
     "name": "Sahil Sharma (@shlsharma)",
-    "role": "member"
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-09-12T12:00:00+05:30"
   },
   "1557596640": {
     "name": "M Sharan",
     "role": "member",
-    "pans": []
+    "pans": [],
+    "joined_at": "2026-09-12T14:30:00+05:30"
   }
 }

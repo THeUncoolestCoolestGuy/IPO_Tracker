@@ -17,7 +17,7 @@ except ImportError:
     from tzlocal import get_localzone as ZoneInfo
 
 from config import Config
-from tracker import run_morning_check, run_reminder_check
+from tracker import run_morning_check, run_reminder_check, run_allotment_check
 
 # Ensure UTF-8 output on Windows consoles
 if hasattr(sys.stdout, "reconfigure"):
@@ -74,11 +74,21 @@ def start_scheduler_daemon():
         misfire_grace_time=3600
     )
 
+    # 10:00 PM IST Job (Allotments & Admin Daily Digest)
+    scheduler.add_job(
+        run_allotment_check,
+        CronTrigger(hour=22, minute=0, timezone=ist_tz),
+        id="nightly_allotment_check",
+        name="Nightly Allotment Check & Admin Digest at 22:00 IST",
+        misfire_grace_time=3600
+    )
+
     print("=" * 65)
     print("🚀 IPO TRACKER SCHEDULER DAEMON STARTED")
     print(f"Timezone:           {tz_str}")
     print(f"Morning Check:      Daily at {Config.MORNING_SCHEDULE_TIME} IST")
     print(f"Reminder Check:     Daily at {Config.REMINDER_SCHEDULE_TIME} IST")
+    print("Nightly Allotment:  Daily at 22:00 IST (with Admin Digest)")
     print(f"GMP Threshold:      > {Config.GMP_THRESHOLD_PERCENT}%")
     print(f"Active Channels:    {', '.join(Config.NOTIFICATION_CHANNELS)}")
     print(f"Recipients:         {', '.join(Config.PHONE_NUMBERS)}")

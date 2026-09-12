@@ -8,6 +8,7 @@ and handles interactive allotment checks (/check).
 import time
 import json
 import logging
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import requests
@@ -16,6 +17,7 @@ from pan_checker import extract_pans, mask_pan, batch_check_pans, format_allotme
 
 logger = logging.getLogger("ipo_tracker.subscribers")
 SUBSCRIBERS_FILE = Config.DATA_DIR / "subscribers.json"
+DISPATCH_STATE_FILE = Config.DATA_DIR / "dispatch_state.json"
 
 
 def _telegram_post_with_retry(
@@ -72,13 +74,15 @@ def load_subscribers_registry() -> Dict[str, Dict[str, Any]]:
             logger.error(f"Error loading subscribers.json: {e}")
 
     baseline = {
-        "2056597708": {"name": "The uncoolest coolest guy", "role": "admin", "pans": []},
-        "443423364": {"name": "Dr. Chirag Paunwala (@cpaunwala)", "role": "member", "pans": []},
-        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member", "pans": []},
-        "424851606": {"name": "K", "role": "member", "status": "blocked", "pans": []},
-        "516357277": {"name": "Paresh Bardolia", "role": "member", "pans": []},
-        "1293713981": {"name": "Sarthak", "role": "member", "pans": []},
-        "1400902994": {"name": "Dobby", "role": "member", "pans": []}
+        "2056597708": {"name": "The uncoolest coolest guy", "role": "admin", "pans": ["DREPP6871C"], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "443423364": {"name": "Dr. Chirag Paunwala (@cpaunwala)", "role": "member", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "424851606": {"name": "K", "role": "member", "status": "blocked", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "516357277": {"name": "Paresh Bardolia", "role": "member", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "1293713981": {"name": "Sarthak", "role": "member", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "1400902994": {"name": "Dobby", "role": "member", "pans": [], "joined_at": "2026-09-08T10:00:00+05:30"},
+        "1763761508": {"name": "Sahil Sharma (@shlsharma)", "role": "member", "pans": [], "joined_at": "2026-09-12T12:00:00+05:30"},
+        "1557596640": {"name": "M Sharan", "role": "member", "pans": [], "joined_at": "2026-09-12T14:30:00+05:30"}
     }
     save_subscribers_registry(baseline)
     return baseline
@@ -163,10 +167,13 @@ def process_incoming_telegram_updates(notify_admin: bool = True) -> List[Dict[st
         # 1. Enrol new subscriber if not in registry
         if cid not in registry:
             logger.info(f"New Telegram subscriber detected: {display_name} (ID: {cid})")
+            IST = timezone(timedelta(hours=5, minutes=30))
+            now_iso = datetime.now(IST).isoformat()
             user_info = {
                 "name": display_name,
                 "role": "member",
-                "pans": []
+                "pans": [],
+                "joined_at": now_iso
             }
             registry[cid] = user_info
             new_subscribers.append({"id": cid, "name": display_name})
@@ -404,3 +411,143 @@ def get_all_active_chat_ids() -> List[str]:
             all_ids.add(cid_str)
 
     return list(all_ids)
+
+
+def has_admin_report_dispatched_today() -> bool:
+    """Check if the admin daily subscriber report has already been dispatched today."""
+    try:
+        if DISPATCH_STATE_FILE.exists():
+            with open(DISPATCH_STATE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            IST = timezone(timedelta(hours=5, minutes=30))
+            today_str = datetime.now(IST).strftime("%Y-%m-%d")
+            return data.get("admin_subscriber_report") == today_str
+    except Exception:
+        pass
+    return False
+
+
+def record_admin_report_dispatch():
+    """Record dispatch of admin daily subscriber report to prevent duplicate sends."""
+    try:
+        Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+        data = {}
+        if DISPATCH_STATE_FILE.exists():
+            try:
+                with open(DISPATCH_STATE_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                data = {}
+        IST = timezone(timedelta(hours=5, minutes=30))
+        today_str = datetime.now(IST).strftime("%Y-%m-%d")
+        data["admin_subscriber_report"] = today_str
+        with open(DISPATCH_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        logger.debug(f"Could not record admin report dispatch state: {e}")
+
+
+def send_daily_admin_subscriber_report(dry_run: bool = False, force: bool = False) -> Dict[str, Any]:
+    """
+    Send daily executive subscriber digest privately to Admin (Config.ADMIN_CHAT_ID)
+    at the 10:00 PM cron job.
+    Reports any new subscribers who joined today, along with overall community counts.
+    """
+    token = Config.TELEGRAM_BOT_TOKEN
+    admin_id = getattr(Config, "ADMIN_CHAT_ID", "2056597708")
+
+    if not token or not admin_id:
+        logger.warning("Cannot send admin subscriber report: missing token or admin_id")
+        return {"status": "error", "message": "Missing credentials"}
+
+    if not force and not dry_run and has_admin_report_dispatched_today():
+        logger.info("Admin daily subscriber report already dispatched today. Skipping duplicate.")
+        return {"status": "skipped_duplicate", "count": 0}
+
+    IST = timezone(timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(IST)
+    today_str = now_ist.strftime("%Y-%m-%d")
+    display_date = now_ist.strftime("%d %b %Y")
+
+    registry = load_subscribers_registry()
+
+    new_today = []
+    active_members = []
+    blocked_members = []
+    total_pans = 0
+    members_with_pans = 0
+
+    for cid, info in registry.items():
+        is_blocked = info.get("status") in ("blocked", "inactive")
+        if is_blocked:
+            blocked_members.append((cid, info))
+        else:
+            active_members.append((cid, info))
+            pans = info.get("pans", [])
+            if pans:
+                members_with_pans += 1
+                total_pans += len(pans)
+
+        joined_at = info.get("joined_at", "")
+        if joined_at.startswith(today_str):
+            new_today.append((cid, info))
+
+    lines = [
+        "👑 <b>[ADMIN] Daily Subscriber Digest</b>",
+        f"📅 <i>{display_date} • 10:00 PM IST Sync</i>",
+        "",
+        "────────────────────────"
+    ]
+
+    if new_today:
+        lines.append(f"🆕 <b>New Subscribers Joined Today ({len(new_today)}):</b>")
+        for cid, u in new_today:
+            uname = u.get("name", "Unknown")
+            pans = len(u.get("pans", []))
+            pan_tag = f"💳 {pans} PAN(s)" if pans > 0 else "💳 0 PANs"
+            lines.append(f"• <b>{uname}</b>\n  🆔 <code>{cid}</code> | {pan_tag}")
+    else:
+        lines.append("🆕 <b>New Subscribers Joined Today:</b>")
+        lines.append("ℹ️ <i>None (No new users joined today)</i>")
+
+    lines.extend([
+        "",
+        "────────────────────────",
+        "📊 <b>Community Overview:</b>",
+        f"• 👥 Total Active Members: <b>{len(active_members)}</b>",
+        f"• 💳 Members with Saved PANs: <b>{members_with_pans}</b> ({total_pans} total PANs registered)",
+        f"• 🚫 Blocked / Inactive: <b>{len(blocked_members)}</b>",
+        "",
+        "────────────────────────",
+        f"📋 <b>All Active Members ({len(active_members)}):</b>"
+    ])
+
+    for idx, (cid, u) in enumerate(active_members, 1):
+        name = u.get("name", "Unknown")
+        is_admin = u.get("role") == "admin" or cid == admin_id
+        role_tag = " [ADMIN]" if is_admin else ""
+        pans = len(u.get("pans", []))
+        pan_info = f" • {pans} PAN" if pans > 0 else ""
+        lines.append(f"{idx}. {name}{role_tag}{pan_info}")
+
+    report_msg = "\n".join(lines).strip()
+
+    if dry_run:
+        print("\n--- [DRY-RUN] ADMIN DAILY SUBSCRIBER REPORT ---")
+        print(report_msg)
+        print("------------------------------------------------\n")
+        return {"status": "dry_run", "message": report_msg, "new_today": len(new_today)}
+
+    success = _telegram_post_with_retry(
+        token,
+        {"chat_id": admin_id, "text": report_msg, "parse_mode": "HTML", "disable_web_page_preview": True}
+    )
+
+    if success:
+        record_admin_report_dispatch()
+        logger.info(f"Admin daily subscriber report dispatched successfully to Admin ({admin_id}).")
+        return {"status": "dispatched", "new_today": len(new_today), "message": report_msg}
+    else:
+        logger.error(f"Failed to dispatch admin daily subscriber report to Admin ({admin_id}).")
+        return {"status": "failed", "new_today": len(new_today)}
+
