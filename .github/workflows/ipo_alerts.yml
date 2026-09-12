@@ -61,6 +61,7 @@ jobs:
           TWILIO_WHATSAPP_NUMBER: ${{ secrets.TWILIO_WHATSAPP_NUMBER }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_IDS: ${{ secrets.TELEGRAM_CHAT_IDS }}
+          TELEGRAM_ADMIN_CHAT_ID: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID || '2056597708' }}
           CALLMEBOT_RECIPIENTS: ${{ secrets.CALLMEBOT_RECIPIENTS }}
           SILENT_ON_EMPTY: 'true'
           ZERODHA_REFERRAL_URL: ${{ secrets.ZERODHA_REFERRAL_URL || 'https://zerodha.com/open-account?c=LJ0070' }}
@@ -137,8 +138,9 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/subscribers.json data/notified_allotments.json data/last_dispatch.json || true
+          git add data/subscribers.json data/notified_allotments.json data/dispatch_state.json || true
           if ! git diff --cached --quiet; then
             git commit -m "Auto-persist dynamic state [skip ci]"
+            git pull origin main --rebase --autostash || true
             git push origin main || echo "State push skipped (no new changes or concurrent push)"
           fi

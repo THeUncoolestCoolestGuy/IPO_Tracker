@@ -181,7 +181,7 @@ def check_and_notify_new_allotments(dry_run: bool = False, force_check: bool = F
                     continue
 
                 logger.info(f"Checking {len(user_pans)} PAN(s) for user {user_data.get('name')} ({chat_id})...")
-                check_res = batch_check_pans(ipo["name"], user_pans)
+                check_res = batch_check_pans(ipo, user_pans)
                 personal_report = format_allotment_report(check_res)
 
                 if dry_run:

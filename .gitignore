@@ -18,6 +18,7 @@ data/*.json
 !data/.gitkeep
 !data/subscribers.json
 !data/notified_allotments.json
+!data/dispatch_state.json
 !data/last_dispatch.json
 
 # ==============================================================================
