@@ -21,9 +21,9 @@ class Config:
 
     # Threshold
     try:
-        GMP_THRESHOLD_PERCENT = float(os.getenv("GMP_THRESHOLD_PERCENT", "10.0"))
+        GMP_THRESHOLD_PERCENT = float(os.getenv("GMP_THRESHOLD_PERCENT", "15.0"))
     except ValueError:
-        GMP_THRESHOLD_PERCENT = 10.0
+        GMP_THRESHOLD_PERCENT = 15.0
 
     # Notification channels: comma-separated e.g. "console,fast2sms"
     _raw_channels = os.getenv("NOTIFICATION_CHANNELS", "console")

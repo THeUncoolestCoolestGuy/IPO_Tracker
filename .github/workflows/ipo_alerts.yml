@@ -52,7 +52,7 @@ jobs:
         env:
           PHONE_NUMBERS: ${{ secrets.PHONE_NUMBERS }}
           WHATSAPP_PHONE_NUMBERS: ${{ secrets.WHATSAPP_PHONE_NUMBERS }}
-          GMP_THRESHOLD_PERCENT: ${{ secrets.GMP_THRESHOLD_PERCENT || '10.0' }}
+          GMP_THRESHOLD_PERCENT: ${{ secrets.GMP_THRESHOLD_PERCENT || '15.0' }}
           NOTIFICATION_CHANNELS: ${{ secrets.NOTIFICATION_CHANNELS || 'console,telegram' }}
           FAST2SMS_API_KEY: ${{ secrets.FAST2SMS_API_KEY }}
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}

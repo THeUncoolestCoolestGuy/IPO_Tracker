@@ -63,7 +63,7 @@ def list_current_ipos():
         closing_mark = "⚠️" if ipo.get("closing_today") else "  "
         print(f"{idx:<3} | {ipo['name'][:25]:<26} | {ipo['price_band']:<10} | ₹{ipo['gmp_rs']:<7.1f} | {ipo['gmp_percent']:>5.2f}% {gmp_highlight} | {ipo['last_filing_date']:<10} {closing_mark} | {ipo['status']}")
 
-    print("\nLegend: 🔥 = GMP exceeds threshold (>10%) | ⚠️ = Closes today\n")
+    print("\nLegend: 🔥 = GMP exceeds threshold (>15%) | ⚠️ = Closes today\n")
 
 
 def test_notification():
@@ -73,7 +73,7 @@ def test_notification():
         "✅ <b>IPO Tracker Test Alert:</b>\n\n"
         "Your IPO alert service is connected successfully!\n"
         "You will receive daily updates:\n"
-        "• <b>08:00 AM:</b> Morning Alert (GMP > 10%)\n"
+        "• <b>08:00 AM:</b> Morning Alert (GMP > 15%)\n"
         "• <b>12:30 PM:</b> Reminder Alert (IPOs closing today)\n"
         "• <b>10:00 PM:</b> Nightly Allotment Declaration Alert"
     )

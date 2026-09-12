@@ -176,7 +176,7 @@ def process_incoming_telegram_updates(notify_admin: bool = True) -> List[Dict[st
                 f"🎉 <b>Welcome to Paunwala IPO Alerts, {first or 'Investor'}!</b>",
                 "",
                 "You are now subscribed to receive daily Indian Mainboard IPO alerts:",
-                "• <b>08:00 AM IST:</b> Morning Alert (GMP &gt; 10%)",
+                "• <b>08:00 AM IST:</b> Morning Alert (GMP &gt; 15%)",
                 "• <b>12:30 PM IST:</b> Reminder Alert (IPOs closing today)",
                 "• <b>10:00 PM IST:</b> Nightly Allotment Declaration Alert",
                 "",
