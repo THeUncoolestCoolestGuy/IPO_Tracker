@@ -2,6 +2,7 @@
 Tracker engine for filtering high-GMP IPOs and building alert messages.
 Orchestrates the 8:00 AM IST Morning Alert, 12:30 PM IST Reminder Alert,
 and 10:00 PM IST Nightly Allotment Check.
+Prioritizes GMP > 15% at the top, and displays 10% - 15% at the end.
 """
 
 import sys
@@ -32,16 +33,13 @@ BROKER_APP_LINKS = {
 DISPATCH_STATE_FILE = Config.DATA_DIR / "last_dispatch.json"
 
 
-def get_eligible_ipos(threshold: float = None) -> List[Dict]:
+def get_eligible_ipos(threshold: float = 10.0) -> List[Dict]:
     """
     Fetch Mainboard IPOs and filter for:
     - Status is NOT 'Closed' (Open or Upcoming)
-    - GMP % >= threshold (default 10.0%)
+    - GMP % >= threshold (default 10.0% to capture both strong and moderate IPOs)
     Sorted by GMP % descending.
     """
-    if threshold is None:
-        threshold = Config.GMP_THRESHOLD_PERCENT
-
     all_ipos = get_all_mainboard_ipos()
     eligible = []
 
@@ -61,32 +59,54 @@ def get_eligible_ipos(threshold: float = None) -> List[Dict]:
 def format_morning_alert(ipos: List[Dict]) -> str:
     """
     Format clean, spacious, visually appealing 8:00 AM IST Morning Alert.
-    Uses bold headings, airy spacing, and concise 1-click links.
+    Highlights GMP > 15% first with full details, followed by 10% - 15% at the end.
     """
     today_str = datetime.now().strftime("%d %b %Y")
+    
+    strong_ipos = [ipo for ipo in ipos if ipo.get("gmp_percent", 0.0) >= 15.0]
+    moderate_ipos = [ipo for ipo in ipos if 10.0 <= ipo.get("gmp_percent", 0.0) < 15.0]
+
     lines = [
         f"🔔 <b>MAINBOARD IPO ALERT</b> • {today_str}",
-        f"<i>Criteria: GMP &gt; {Config.GMP_THRESHOLD_PERCENT}%</i>",
-        "",
-        f"Found <b>{len(ipos)}</b> Mainboard IPO(s) with strong GMP:",
         ""
     ]
 
-    for idx, ipo in enumerate(ipos, 1):
-        name = ipo['name']
-        price = ipo['price_band']
-        gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
-        gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-        last_date = ipo['last_filing_date']
-        status = ipo['status'].upper()
+    # Section 1: Strong GMP (>15%) shown first
+    if strong_ipos:
+        lines.append(f"🔥 <b>STRONG CONVICTION (GMP &gt; 15%):</b>")
+        lines.append("")
+        for idx, ipo in enumerate(strong_ipos, 1):
+            name = ipo['name']
+            price = ipo['price_band']
+            gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
+            gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+            last_date = ipo['last_filing_date']
+            status = ipo['status'].upper()
 
-        closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
+            closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
 
-        lines.append(f"<b>{idx}. {name}</b>")
-        lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
-        lines.append(f"   • <b>Price:</b> {price}")
-        lines.append(f"   • <b>Last Filing:</b> {last_date}")
-        lines.append(f"   • <b>Status:</b> {status}")
+            lines.append(f"<b>{idx}. {name}</b>")
+            lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
+            lines.append(f"   • <b>Price:</b> {price}")
+            lines.append(f"   • <b>Last Filing:</b> {last_date}")
+            lines.append(f"   • <b>Status:</b> {status}")
+            lines.append("")
+    else:
+        lines.append("ℹ️ <i>No Mainboard IPOs currently exceed 15% GMP.</i>")
+        lines.append("")
+
+    # Section 2: Moderate GMP (10% - 15%) shown last!
+    if moderate_ipos:
+        lines.append("────────────────────────")
+        lines.append("📊 <b>MODERATE GMP (10% – 15%):</b>")
+        lines.append("")
+        for ipo in moderate_ipos:
+            name = ipo['name']
+            price = ipo['price_band']
+            gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
+            gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+            closing_note = " ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
+            lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price}{closing_note}")
         lines.append("")
 
     lines.append("────────────────────────")
@@ -108,7 +128,7 @@ def format_morning_alert(ipos: List[Dict]) -> str:
 def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     """
     Format clean, spacious 12:30 PM IST Reminder Alert.
-    Prioritizes IPOs closing TODAY or currently OPEN.
+    Prioritizes IPOs closing TODAY or currently OPEN, with 10%-15% listed in secondary section.
     """
     today_str = datetime.now().strftime("%d %b %Y")
     closing_today = [ipo for ipo in ipos if ipo.get("closing_today")]
@@ -152,14 +172,25 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
         return "\n".join(lines).strip(), True
 
     elif currently_open:
-        lines.append("📋 <b>Active Mainboard IPOs currently OPEN:</b>")
-        lines.append("")
-        for ipo in currently_open:
-            name = ipo['name']
-            gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            lines.append(f"<b>• {name}</b>")
-            lines.append(f"   • <b>GMP:</b> {gmp_pct}")
-            lines.append(f"   • <b>Last Filing Date:</b> {ipo['last_filing_date']}")
+        strong_open = [ipo for ipo in currently_open if ipo.get("gmp_percent", 0.0) >= 15.0]
+        moderate_open = [ipo for ipo in currently_open if 10.0 <= ipo.get("gmp_percent", 0.0) < 15.0]
+
+        if strong_open:
+            lines.append("🔥 <b>Active Mainboard IPOs OPEN (GMP &gt; 15%):</b>")
+            lines.append("")
+            for ipo in strong_open:
+                name = ipo['name']
+                gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+                lines.append(f"<b>• {name}</b>")
+                lines.append(f"   • <b>GMP:</b> {gmp_pct}")
+                lines.append(f"   • <b>Last Filing Date:</b> {ipo['last_filing_date']}")
+                lines.append("")
+
+        if moderate_open:
+            lines.append("📊 <b>Moderate GMP OPEN (10% – 15%):</b>")
+            lines.append("")
+            for ipo in moderate_open:
+                lines.append(f"• <b>{ipo['name']}</b>: GMP <b>+{ipo['gmp_percent']:.1f}%</b> | Closes: {ipo['last_filing_date']}")
             lines.append("")
 
         lines.append("────────────────────────")
@@ -256,12 +287,12 @@ def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = 
     except Exception as e:
         logger.error(f"Error checking allotments in morning check: {e}")
 
-    eligible_ipos = get_eligible_ipos()
+    eligible_ipos = get_eligible_ipos(threshold=10.0)
 
     if not eligible_ipos:
-        logger.info(f"No Mainboard IPOs found with GMP > {Config.GMP_THRESHOLD_PERCENT}%.")
+        logger.info("No Mainboard IPOs found with GMP >= 10.0%.")
         if not Config.SILENT_ON_EMPTY:
-            msg = f"ℹ️ [8:00 AM] IPO Update: No Mainboard IPOs currently meet the {Config.GMP_THRESHOLD_PERCENT}% GMP criteria today."
+            msg = "ℹ️ [8:00 AM] IPO Update: No Mainboard IPOs currently meet the 10% GMP criteria today."
             if not dry_run:
                 dispatch_alert(msg)
                 _record_dispatch("morning")
@@ -311,10 +342,10 @@ def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool =
     except Exception as e:
         logger.error(f"Error checking allotments in reminder check: {e}")
 
-    eligible_ipos = get_eligible_ipos()
+    eligible_ipos = get_eligible_ipos(threshold=10.0)
 
     if not eligible_ipos:
-        logger.info(f"No Mainboard IPOs with GMP > {Config.GMP_THRESHOLD_PERCENT}% for reminder.")
+        logger.info("No Mainboard IPOs with GMP >= 10.0% for reminder.")
         return {"status": "silent_empty", "count": 0, "message": None}
 
     message, has_urgent = format_reminder_alert(eligible_ipos)
