@@ -383,5 +383,14 @@ def run_allotment_check(dry_run: bool = False, force: bool = False) -> Dict:
     except Exception as e:
         logger.error(f"Error syncing Telegram messages before allotment check: {e}")
 
+    admin_report_res = {}
+    try:
+        from subscriber_manager import send_daily_admin_subscriber_report
+        admin_report_res = send_daily_admin_subscriber_report(dry_run=dry_run, force=force)
+    except Exception as e:
+        logger.error(f"Error sending daily admin subscriber report: {e}")
+
     from allotment_tracker import check_and_notify_new_allotments
-    return check_and_notify_new_allotments(dry_run=dry_run, force_check=force)
+    allotment_res = check_and_notify_new_allotments(dry_run=dry_run, force_check=force)
+    allotment_res["admin_report"] = admin_report_res
+    return allotment_res

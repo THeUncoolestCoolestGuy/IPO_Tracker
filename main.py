@@ -98,6 +98,8 @@ def main():
     parser.add_argument("--pans", type=str, default="", help="Comma-separated PAN numbers for --check-pan (e.g. ABCDE1234F,BCDEF2345G)")
     parser.add_argument("--company", type=str, default=None, help="Company name or ID for --check-pan")
     parser.add_argument("--sync-messages", action="store_true", help="Process pending Telegram commands and user messages")
+    parser.add_argument("--admin-report", action="store_true", help="Send the daily subscriber update report to Admin")
+    parser.add_argument("--force", action="store_true", help="Force send even if already dispatched today")
     parser.add_argument("--skip-if-already-dispatched", action="store_true", help="Skip if today's alert was already dispatched")
 
     args = parser.parse_args()
@@ -143,9 +145,15 @@ def main():
         report = format_allotment_report(res)
         print("\n" + strip_html(report) + "\n")
 
+    elif args.admin_report:
+        print("▶ Sending Daily Subscriber Report to Admin...")
+        from subscriber_manager import send_daily_admin_subscriber_report
+        res = send_daily_admin_subscriber_report(dry_run=args.dry_run, force=args.force)
+        print(f"Completed with status: {res['status']} (New today: {res.get('new_today', 0)})")
+
     elif args.check_allotment:
         print("▶ Executing 10:00 PM Nightly IPO Allotment Check across registrars...")
-        res = run_allotment_check(dry_run=args.dry_run)
+        res = run_allotment_check(dry_run=args.dry_run, force=args.force)
         print(f"Completed with status: {res['status']} (New allotments: {res.get('new_allotments', [])})")
 
     elif args.run_now:
@@ -174,6 +182,7 @@ def main():
         print("  python main.py --run-now --dry-run      : Test morning alert without sending SMS")
         print("  python main.py --run-reminder --dry-run : Test 12:30 PM reminder without sending SMS")
         print("  python main.py --check-allotment        : Scan registrars for newly declared IPO allotments (10:00 PM)")
+        print("  python main.py --admin-report           : Send daily subscriber update report to Admin")
         print("  python main.py --check-pan --pans <PANS>: Check allotment status for single/multiple PANs")
         print("  python main.py --sync-messages          : Process pending Telegram user commands (/pan, /check)")
         print("  python main.py --run-now                : Run live morning alert (sends messages)")
