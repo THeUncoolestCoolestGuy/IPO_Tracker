@@ -8,7 +8,7 @@ import re
 import logging
 from typing import List, Dict, Any
 import requests
-from .base import BaseNotifier
+from .base import BaseNotifier, strip_html
 from config import Config
 
 logger = logging.getLogger("ipo_tracker.notifiers.fast2sms")
@@ -70,7 +70,7 @@ class Fast2SMSNotifier(BaseNotifier):
         }
         payload = {
             "route": "q",  # Quick SMS route for direct personal messages
-            "message": message,
+            "message": strip_html(message),
             "language": "english",
             "flash": 0,
             "numbers": numbers_str

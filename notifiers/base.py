@@ -3,8 +3,25 @@ Base notifier class interface.
 All notification channels inherit from this class.
 """
 
+import re
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+
+
+def strip_html(text: str) -> str:
+    """
+    Convert HTML formatting to clean plain text for SMS and Console.
+    Replaces <a href="url">text</a> with text (url), strips <b>, <i>, <code>, etc.
+    """
+    if not text:
+        return ""
+    # Convert <a href="url">label</a> to label (url)
+    cleaned = re.sub(r'<a\s+(?:[^>]*?\s+)?href=["\']([^"\']*)["\'][^>]*>(.*?)</a>', r'\2 (\1)', text, flags=re.DOTALL)
+    # Strip remaining HTML tags
+    cleaned = re.sub(r'<[^>]+>', '', cleaned)
+    # Decode basic entities
+    cleaned = cleaned.replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&")
+    return cleaned
 
 
 class BaseNotifier(ABC):

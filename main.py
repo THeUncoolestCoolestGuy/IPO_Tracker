@@ -10,6 +10,7 @@ from scraper import get_all_mainboard_ipos
 from tracker import run_morning_check, run_reminder_check, run_allotment_check
 from scheduler import start_scheduler_daemon
 from notifiers import dispatch_alert
+from notifiers.base import strip_html
 
 # Ensure UTF-8 output on Windows consoles
 if hasattr(sys.stdout, "reconfigure"):
@@ -39,7 +40,7 @@ def print_banner():
     if Config.WHATSAPP_PHONE_NUMBERS:
         print(f" WhatsApp Targets: {', '.join(Config.WHATSAPP_PHONE_NUMBERS)} (Chirag & Mita Paunwala only)")
     print(f" GMP Threshold:    > {Config.GMP_THRESHOLD_PERCENT}%")
-    print(f" Schedules:        {Config.MORNING_SCHEDULE_TIME} & {Config.REMINDER_SCHEDULE_TIME} IST")
+    print(f" Schedules:        08:00 AM, 12:30 PM & 10:00 PM IST")
     print(f" Channels:         {', '.join(Config.NOTIFICATION_CHANNELS)}")
     print("=" * 65 + "\n")
 
@@ -69,9 +70,12 @@ def test_notification():
     """Send a test message to verify notification configuration."""
     print("📲 Sending Test Notification across configured channels...")
     test_msg = (
-        "✅ IPO Tracker Test Alert:\n"
+        "✅ <b>IPO Tracker Test Alert:</b>\n\n"
         "Your IPO alert service is connected successfully!\n"
-        "You will receive daily updates at 8:00 AM and 12:30 PM IST when Mainboard IPO GMP > 10%."
+        "You will receive daily updates:\n"
+        "• <b>08:00 AM:</b> Morning Alert (GMP > 10%)\n"
+        "• <b>12:30 PM:</b> Reminder Alert (IPOs closing today)\n"
+        "• <b>10:00 PM:</b> Nightly Allotment Declaration Alert"
     )
     results = dispatch_alert(test_msg)
     print("\nDispatch Results:")
@@ -89,7 +93,11 @@ def main():
     parser.add_argument("--list", action="store_true", help="List all current Mainboard IPOs and their GMP")
     parser.add_argument("--test-notification", action="store_true", help="Send a test message to configured channels")
     parser.add_argument("--subscribers", action="store_true", help="Check for newly joined Telegram users and list active subscribers")
-    parser.add_argument("--check-allotment", action="store_true", help="Scan registrars for newly declared IPO allotments")
+    parser.add_argument("--check-allotment", action="store_true", help="Scan registrars for newly declared IPO allotments (10:00 PM Nightly)")
+    parser.add_argument("--check-pan", action="store_true", help="Check allotment status for specific PAN(s)")
+    parser.add_argument("--pans", type=str, default="", help="Comma-separated PAN numbers for --check-pan (e.g. ABCDE1234F,BCDEF2345G)")
+    parser.add_argument("--company", type=str, default=None, help="Company name or ID for --check-pan")
+    parser.add_argument("--sync-messages", action="store_true", help="Process pending Telegram commands and user messages")
     parser.add_argument("--skip-if-already-dispatched", action="store_true", help="Skip if today's alert was already dispatched")
 
     args = parser.parse_args()
@@ -97,9 +105,9 @@ def main():
     print_banner()
 
     if args.subscribers:
-        print("▶ Checking for new Telegram subscribers...")
-        from subscriber_manager import sync_new_subscribers, load_subscribers_registry
-        new_users = sync_new_subscribers(notify_admin=True)
+        print("▶ Checking for new Telegram subscribers and user updates...")
+        from subscriber_manager import process_incoming_telegram_updates, load_subscribers_registry
+        new_users = process_incoming_telegram_updates(notify_admin=True)
         if new_users:
             print(f"🎉 Detected {len(new_users)} new user(s) and notified Admin!")
             for u in new_users:
@@ -111,11 +119,32 @@ def main():
         print(f"\n📋 Currently Enrolled Subscribers ({len(registry)}):")
         for cid, info in registry.items():
             role_tag = f"[{info.get('role', 'member').upper()}]"
-            print(f"  • {info.get('name', 'Unknown')} (ID: {cid}) {role_tag}")
+            pan_count = len(info.get("pans", []))
+            pan_str = f"({pan_count} saved PANs)" if pan_count > 0 else "(no PANs saved)"
+            status_tag = f" [{info.get('status').upper()}]" if info.get('status') else ""
+            print(f"  • {info.get('name', 'Unknown')} (ID: {cid}) {role_tag} {pan_str}{status_tag}")
         print()
 
+    elif args.sync_messages:
+        print("▶ Processing incoming Telegram commands and messages...")
+        from subscriber_manager import process_incoming_telegram_updates
+        new_users = process_incoming_telegram_updates(notify_admin=True)
+        print("✅ Telegram sync completed.")
+
+    elif args.check_pan:
+        from pan_checker import extract_pans, batch_check_pans, format_allotment_report
+        pan_list = extract_pans(args.pans) if args.pans else []
+        if not pan_list:
+            print("❌ No valid PAN numbers specified. Use --pans ABCDE1234F,BCDEF2345G")
+            return
+
+        print(f"▶ Checking {len(pan_list)} PAN(s) for company: {args.company or 'Latest KFintech IPO'}...")
+        res = batch_check_pans(args.company, pan_list)
+        report = format_allotment_report(res)
+        print("\n" + strip_html(report) + "\n")
+
     elif args.check_allotment:
-        print("▶ Checking registrars for newly declared IPO allotments...")
+        print("▶ Executing 10:00 PM Nightly IPO Allotment Check across registrars...")
         res = run_allotment_check(dry_run=args.dry_run)
         print(f"Completed with status: {res['status']} (New allotments: {res.get('new_allotments', [])})")
 
@@ -140,15 +169,16 @@ def main():
         list_current_ipos()
 
     else:
-        # Default: list current IPOs and show helpful usage instructions
         list_current_ipos()
         print("Quick Commands:")
         print("  python main.py --run-now --dry-run      : Test morning alert without sending SMS")
         print("  python main.py --run-reminder --dry-run : Test 12:30 PM reminder without sending SMS")
-        print("  python main.py --check-allotment        : Scan registrars for newly declared IPO allotments")
-        print("  python main.py --run-now                : Run live morning alert (sends SMS/messages)")
+        print("  python main.py --check-allotment        : Scan registrars for newly declared IPO allotments (10:00 PM)")
+        print("  python main.py --check-pan --pans <PANS>: Check allotment status for single/multiple PANs")
+        print("  python main.py --sync-messages          : Process pending Telegram user commands (/pan, /check)")
+        print("  python main.py --run-now                : Run live morning alert (sends messages)")
         print("  python main.py --daemon                 : Keep running in background on this PC")
-        print("  python main.py --test-notification      : Test your SMS / WhatsApp / Telegram setup\n")
+        print("  python main.py --test-notification      : Test your notification channels\n")
 
 
 if __name__ == "__main__":

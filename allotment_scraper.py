@@ -182,3 +182,4 @@ if __name__ == "__main__":
     print("\nSample IPOs declared:")
     for item in results[:10]:
         print(f"  [{item['registrar']}] {item['name']} -> {item['portal_url']}")
+

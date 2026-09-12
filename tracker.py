@@ -1,12 +1,14 @@
 """
 Tracker engine for filtering high-GMP IPOs and building alert messages.
-Orchestrates the 8:00 AM IST Morning Alert and 12:30 PM IST Reminder Alert.
+Orchestrates the 8:00 AM IST Morning Alert, 12:30 PM IST Reminder Alert,
+and 10:00 PM IST Nightly Allotment Check.
 """
 
 import sys
+import json
 import logging
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from config import Config
 from scraper import get_all_mainboard_ipos
 from notifiers import dispatch_alert
@@ -27,6 +29,8 @@ BROKER_APP_LINKS = {
     "Sharekhan": "https://play.google.com/store/apps/details?id=com.sharekhan.androidsharemobile"
 }
 
+DISPATCH_STATE_FILE = Config.DATA_DIR / "last_dispatch.json"
+
 
 def get_eligible_ipos(threshold: float = None) -> List[Dict]:
     """
@@ -43,7 +47,6 @@ def get_eligible_ipos(threshold: float = None) -> List[Dict]:
 
     for ipo in all_ipos:
         status = ipo.get("status", "").lower()
-        # Exclude closed IPOs
         if status == "closed":
             continue
 
@@ -51,21 +54,22 @@ def get_eligible_ipos(threshold: float = None) -> List[Dict]:
         if gmp_pct >= threshold:
             eligible.append(ipo)
 
-    # Sort descending by GMP percentage
     eligible.sort(key=lambda x: x.get("gmp_percent", 0.0), reverse=True)
     return eligible
 
 
 def format_morning_alert(ipos: List[Dict]) -> str:
     """
-    Format the 8:00 AM IST Morning Alert message.
-    Specifies IPO Name, Price, GMP (₹ and %), Last Filing Date, and Status.
+    Format clean, spacious, visually appealing 8:00 AM IST Morning Alert.
+    Uses bold headings, airy spacing, and concise 1-click links.
     """
     today_str = datetime.now().strftime("%d %b %Y")
     lines = [
-        f"🔔 [8:00 AM] MAINBOARD IPO ALERT ({today_str})",
-        f"Threshold: GMP > {Config.GMP_THRESHOLD_PERCENT}%\n",
-        f"Found {len(ipos)} Mainboard IPO(s) with high GMP:\n"
+        f"🔔 <b>MAINBOARD IPO ALERT</b> • {today_str}",
+        f"<i>Criteria: GMP &gt; {Config.GMP_THRESHOLD_PERCENT}%</i>",
+        "",
+        f"Found <b>{len(ipos)}</b> Mainboard IPO(s) with strong GMP:",
+        ""
     ]
 
     for idx, ipo in enumerate(ipos, 1):
@@ -76,104 +80,124 @@ def format_morning_alert(ipos: List[Dict]) -> str:
         last_date = ipo['last_filing_date']
         status = ipo['status'].upper()
 
-        closing_note = " ⚠️ (CLOSING TODAY!)" if ipo.get("closing_today") else ""
+        closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
 
-        lines.append(f"{idx}. {name}")
-        lines.append(f"   • GMP: {gmp_rs} ({gmp_pct})")
-        lines.append(f"   • Price: {price}")
-        lines.append(f"   • Last Filing Date: {last_date}{closing_note}")
-        lines.append(f"   • Status: {status}")
-        if ipo.get("status", "").lower() == "open":
-            lines.append("   📲 Open App to Apply:")
-            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
-            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
-            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
-            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-        else:
-            lines.append("")
+        lines.append(f"<b>{idx}. {name}</b>")
+        lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
+        lines.append(f"   • <b>Price:</b> {price}")
+        lines.append(f"   • <b>Last Filing:</b> {last_date}")
+        lines.append(f"   • <b>Status:</b> {status}")
+        lines.append("")
 
-    lines.append("Apply via ASBA/UPI before 5:00 PM on the closing date.\n")
-    lines.append("📲 Direct Broker Launchers:")
-    lines.append(f"• Kite: {BROKER_APP_LINKS['Kite']}")
-    lines.append(f"• Upstox: {BROKER_APP_LINKS['Upstox']}")
-    lines.append(f"• Groww: {BROKER_APP_LINKS['Groww']}")
-    lines.append(f"• Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-    lines.append("🎁 Don't have a Demat Account yet? Open free & start applying:")
-    lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
-    lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
-    lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
+    lines.append("────────────────────────")
+    lines.append("📲 <b>1-Click Apply:</b>")
+    lines.append(
+        f'<a href="{BROKER_APP_LINKS["Kite"]}">Kite</a>  •  '
+        f'<a href="{BROKER_APP_LINKS["Upstox"]}">Upstox</a>  •  '
+        f'<a href="{BROKER_APP_LINKS["Groww"]}">Groww</a>  •  '
+        f'<a href="{BROKER_APP_LINKS["Sharekhan"]}">Sharekhan</a>'
+    )
+    lines.append("")
+    lines.append("🎁 <b>Open Free Demat Account:</b>")
+    lines.append(f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>')
+    lines.append(f'• <a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a> (Zero AMC)')
+    lines.append(f'• <a href="{Config.GROWW_REFERRAL_URL}">Groww</a> (Code: <code>{Config.GROWW_REFERRAL_CODE}</code>)')
     return "\n".join(lines).strip()
 
 
 def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     """
-    Format the 12:30 PM IST Reminder message.
+    Format clean, spacious 12:30 PM IST Reminder Alert.
     Prioritizes IPOs closing TODAY or currently OPEN.
-    Returns (message_text, has_urgent_closing).
     """
     today_str = datetime.now().strftime("%d %b %Y")
     closing_today = [ipo for ipo in ipos if ipo.get("closing_today")]
     currently_open = [ipo for ipo in ipos if ipo.get("status", "").lower() == "open"]
 
     lines = [
-        f"⚠️ [12:30 PM] IPO REMINDER ALERT ({today_str})"
+        f"⚠️ <b>IPO REMINDER ALERT</b> • {today_str}",
+        ""
     ]
 
     if closing_today:
-        lines.append("\n🚨 IPOs CLOSING TODAY (Last Chance to Apply!):")
+        lines.append("🚨 <b>CLOSING TODAY (Last Chance to Apply!):</b>")
+        lines.append("")
         for ipo in closing_today:
             name = ipo['name']
             gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            lines.append(f" • {name}: GMP {gmp_rs} ({gmp_pct}) | Price: {ipo['price_band']}")
-            lines.append(f"   Last Filing Cut-off: TODAY 5:00 PM IST")
-            lines.append("   📲 Open App to Apply:")
-            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
-            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
-            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
-            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-        lines.append("Submit your ASBA / UPI bid before 5:00 PM IST today!\n")
-        lines.append("🎁 Don't have a Demat Account yet? Open free:")
-        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
-        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
-        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
+            lines.append(f"<b>• {name}</b>")
+            lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥")
+            lines.append(f"   • <b>Price Band:</b> {ipo['price_band']}")
+            lines.append("   • <b>Cut-off:</b> TODAY at 5:00 PM IST")
+            lines.append("")
+
+        lines.append("⏰ <i>Submit your ASBA / UPI bid before 5:00 PM IST today!</i>")
+        lines.append("")
+        lines.append("────────────────────────")
+        lines.append("📲 <b>1-Click Apply:</b>")
+        lines.append(
+            f'<a href="{BROKER_APP_LINKS["Kite"]}">Kite</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Upstox"]}">Upstox</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Groww"]}">Groww</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Sharekhan"]}">Sharekhan</a>'
+        )
+        lines.append("")
+        lines.append("🎁 <b>Open Demat Account:</b>")
+        lines.append(
+            f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>  •  '
+            f'<a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a>  •  '
+            f'<a href="{Config.GROWW_REFERRAL_URL}">Groww</a>'
+        )
         return "\n".join(lines).strip(), True
 
     elif currently_open:
-        lines.append("\n📋 Active IPOs currently OPEN with GMP > 10%:")
+        lines.append("📋 <b>Active Mainboard IPOs currently OPEN:</b>")
+        lines.append("")
         for ipo in currently_open:
             name = ipo['name']
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            lines.append(f" • {name}: GMP {gmp_pct} | Last Filing Date: {ipo['last_filing_date']}")
-            lines.append("   📲 Open App to Apply:")
-            lines.append(f"   • Kite: {BROKER_APP_LINKS['Kite']}")
-            lines.append(f"   • Upstox: {BROKER_APP_LINKS['Upstox']}")
-            lines.append(f"   • Groww: {BROKER_APP_LINKS['Groww']}")
-            lines.append(f"   • Sharekhan: {BROKER_APP_LINKS['Sharekhan']}\n")
-        lines.append("Plan your bidding before the closing date 5:00 PM.\n")
-        lines.append("🎁 Don't have a Demat Account yet? Open free:")
-        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
-        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
-        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
+            lines.append(f"<b>• {name}</b>")
+            lines.append(f"   • <b>GMP:</b> {gmp_pct}")
+            lines.append(f"   • <b>Last Filing Date:</b> {ipo['last_filing_date']}")
+            lines.append("")
+
+        lines.append("────────────────────────")
+        lines.append("📲 <b>1-Click Apply:</b>")
+        lines.append(
+            f'<a href="{BROKER_APP_LINKS["Kite"]}">Kite</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Upstox"]}">Upstox</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Groww"]}">Groww</a>  •  '
+            f'<a href="{BROKER_APP_LINKS["Sharekhan"]}">Sharekhan</a>'
+        )
+        lines.append("")
+        lines.append("🎁 <b>Open Demat Account:</b>")
+        lines.append(
+            f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>  •  '
+            f'<a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a>  •  '
+            f'<a href="{Config.GROWW_REFERRAL_URL}">Groww</a>'
+        )
         return "\n".join(lines).strip(), False
 
     elif ipos:
-        lines.append("\nUpcoming High-GMP Mainboard IPOs:")
+        lines.append("📋 <b>Upcoming High-GMP Mainboard IPOs:</b>")
+        lines.append("")
         for ipo in ipos:
-            lines.append(f" • {ipo['name']}: GMP +{ipo['gmp_percent']:.1f}% | Opens: {ipo['start_date']} | Closes: {ipo['last_filing_date']}")
-        lines.append("\nPlan your funds before bidding opens!\n")
-        lines.append("🎁 Don't have a Demat Account yet? Open free:")
-        lines.append(f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}")
-        lines.append(f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}")
-        lines.append(f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}")
+            lines.append(f"<b>• {ipo['name']}</b>")
+            lines.append(f"   • <b>GMP:</b> +{ipo['gmp_percent']:.1f}%")
+            lines.append(f"   • <b>Opens:</b> {ipo['start_date']} | <b>Closes:</b> {ipo['last_filing_date']}")
+            lines.append("")
+
+        lines.append("────────────────────────")
+        lines.append("🎁 <b>Open Free Demat Account:</b>")
+        lines.append(
+            f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>  •  '
+            f'<a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a>  •  '
+            f'<a href="{Config.GROWW_REFERRAL_URL}">Groww</a>'
+        )
         return "\n".join(lines).strip(), False
 
     return "", False
-
-
-import json
-
-DISPATCH_STATE_FILE = Config.DATA_DIR / "last_dispatch.json"
 
 
 def _record_dispatch(dispatch_type: str):
@@ -211,7 +235,7 @@ def has_dispatched_today(dispatch_type: str) -> bool:
 def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = False) -> Dict:
     """
     Execute the 8:00 AM IST Morning Workflow.
-    Automatically checks for new Telegram subscribers and notifies admin every day.
+    Syncs Telegram subscribers and checks for newly declared IPO allotments.
     """
     today_str = datetime.now().strftime("%Y-%m-%d")
     if skip_if_already_dispatched and has_dispatched_today("morning"):
@@ -220,14 +244,12 @@ def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = 
 
     logger.info("Executing 8:00 AM Morning IPO Check...")
 
-    # Check for newly joined users every day
     try:
-        from subscriber_manager import sync_new_subscribers
-        sync_new_subscribers(notify_admin=True)
+        from subscriber_manager import process_incoming_telegram_updates
+        process_incoming_telegram_updates()
     except Exception as e:
-        logger.error(f"Error syncing subscribers in morning check: {e}")
+        logger.error(f"Error processing Telegram updates in morning check: {e}")
 
-    # Check for newly declared IPO allotments
     try:
         from allotment_tracker import check_and_notify_new_allotments
         check_and_notify_new_allotments(dry_run=dry_run)
@@ -268,7 +290,7 @@ def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = 
 def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool = False) -> Dict:
     """
     Execute the 12:30 PM IST Reminder Workflow.
-    Automatically checks for new Telegram subscribers and notifies admin every day.
+    Syncs Telegram subscribers and checks for newly declared IPO allotments.
     """
     today_str = datetime.now().strftime("%Y-%m-%d")
     if skip_if_already_dispatched and has_dispatched_today("reminder"):
@@ -277,14 +299,12 @@ def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool =
 
     logger.info("Executing 12:30 PM Reminder IPO Check...")
 
-    # Check for newly joined users every day
     try:
-        from subscriber_manager import sync_new_subscribers
-        sync_new_subscribers(notify_admin=True)
+        from subscriber_manager import process_incoming_telegram_updates
+        process_incoming_telegram_updates()
     except Exception as e:
-        logger.error(f"Error syncing subscribers in reminder check: {e}")
+        logger.error(f"Error processing Telegram updates in reminder check: {e}")
 
-    # Check for newly declared IPO allotments
     try:
         from allotment_tracker import check_and_notify_new_allotments
         check_and_notify_new_allotments(dry_run=dry_run)
@@ -320,8 +340,17 @@ def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool =
 
 def run_allotment_check(dry_run: bool = False, force: bool = False) -> Dict:
     """
-    Dedicated check for newly declared IPO allotments across Link Intime, KFintech, and Bigshare.
+    Dedicated 10:00 PM IST Nightly IPO Allotment Check.
+    1. Processes any pending Telegram user commands (/pan, /check).
+    2. Scans Link Intime, KFintech, and Bigshare for new allotments.
+    3. Auto-checks registered subscriber PANs for captcha-free registrars.
     """
-    logger.info("Executing on-demand IPO Allotment Check across registrars...")
+    logger.info("Executing 10:00 PM Nightly IPO Allotment Check...")
+    try:
+        from subscriber_manager import process_incoming_telegram_updates
+        process_incoming_telegram_updates()
+    except Exception as e:
+        logger.error(f"Error syncing Telegram messages before allotment check: {e}")
+
     from allotment_tracker import check_and_notify_new_allotments
     return check_and_notify_new_allotments(dry_run=dry_run, force_check=force)

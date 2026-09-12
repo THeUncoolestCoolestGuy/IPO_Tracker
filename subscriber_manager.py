@@ -1,24 +1,30 @@
 """
 Subscriber Manager for Telegram Bot.
 Auto-detects when new users start the bot, enrolls them,
-and notifies the admin immediately.
+manages user PAN cards (/pan, /mypan, /removepan),
+and handles interactive allotment checks (/check).
 """
 
+import time
 import json
 import logging
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import requests
 from config import Config
+from pan_checker import extract_pans, mask_pan, batch_check_pans, format_allotment_report
 
 logger = logging.getLogger("ipo_tracker.subscribers")
 SUBSCRIBERS_FILE = Config.DATA_DIR / "subscribers.json"
 
 
-import time
-
-def _telegram_post_with_retry(token: str, payload: Dict[str, Any], max_retries: int = 3, timeout: int = 60) -> bool:
-    """Send a POST request to Telegram sendMessage with retry and backoff."""
+def _telegram_post_with_retry(
+    token: str,
+    payload: Dict[str, Any],
+    max_retries: int = 3,
+    timeout: int = 60
+) -> bool:
+    """Send a POST request to Telegram sendMessage with retry, backoff, and HTML fallback."""
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     for attempt in range(1, max_retries + 1):
         try:
@@ -26,9 +32,18 @@ def _telegram_post_with_retry(token: str, payload: Dict[str, Any], max_retries: 
             data = res.json()
             if data.get("ok"):
                 return True
+
             code = data.get("error_code")
+            desc = data.get("description", "")
+
+            # Fallback to plain text if HTML parse error
+            if code == 400 and "can't parse" in desc.lower() and "parse_mode" in payload:
+                logger.warning(f"Telegram parse error for {payload.get('chat_id')}: {desc}. Retrying plain text.")
+                payload.pop("parse_mode", None)
+                continue
+
             if code in (400, 403):
-                logger.warning(f"Telegram permanent failure for {payload.get('chat_id')}: {data.get('description')}")
+                logger.warning(f"Telegram permanent failure for {payload.get('chat_id')}: {desc}")
                 return False
             if code == 429:
                 retry_after = data.get("parameters", {}).get("retry_after", 3)
@@ -56,15 +71,14 @@ def load_subscribers_registry() -> Dict[str, Dict[str, Any]]:
         except Exception as e:
             logger.error(f"Error loading subscribers.json: {e}")
 
-    # Baseline with all verified subscribers
     baseline = {
-        "2056597708": {"name": "The uncoolest coolest guy", "role": "admin"},
-        "443423364": {"name": "Dr. Chirag Paunwala (@cpaunwala)", "role": "member"},
-        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member"},
-        "424851606": {"name": "K", "role": "member"},
-        "516357277": {"name": "Paresh Bardolia", "role": "member"},
-        "1293713981": {"name": "Sarthak", "role": "member"},
-        "1400902994": {"name": "Dobby", "role": "member"}
+        "2056597708": {"name": "The uncoolest coolest guy", "role": "admin", "pans": []},
+        "443423364": {"name": "Dr. Chirag Paunwala (@cpaunwala)", "role": "member", "pans": []},
+        "810585239": {"name": "Mita Paunwala (@Mpaunwala)", "role": "member", "pans": []},
+        "424851606": {"name": "K", "role": "member", "status": "blocked", "pans": []},
+        "516357277": {"name": "Paresh Bardolia", "role": "member", "pans": []},
+        "1293713981": {"name": "Sarthak", "role": "member", "pans": []},
+        "1400902994": {"name": "Dobby", "role": "member", "pans": []}
     }
     save_subscribers_registry(baseline)
     return baseline
@@ -80,11 +94,25 @@ def save_subscribers_registry(registry: Dict[str, Dict[str, Any]]):
         logger.error(f"Error saving subscribers.json: {e}")
 
 
-def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
+def deactivate_subscriber(chat_id: str, reason: str = "blocked"):
+    """Mark a subscriber as inactive / blocked so we don't attempt sending to them."""
+    cid = str(chat_id).strip()
+    registry = load_subscribers_registry()
+    if cid in registry:
+        registry[cid]["status"] = reason
+        save_subscribers_registry(registry)
+        logger.info(f"Subscriber {cid} marked as {reason}.")
+
+
+def process_incoming_telegram_updates(notify_admin: bool = True) -> List[Dict[str, Any]]:
     """
-    Poll Telegram getUpdates to detect any users who started the bot.
-    Enrolls them, sends a welcome message, and informs the admin.
-    Returns list of newly registered subscribers.
+    Poll Telegram getUpdates to process all incoming user commands and messages:
+    - /start: Enroll new subscriber, show welcome menu
+    - /pan <PANS>: Save single or multiple PAN cards for automated allotment checks
+    - /mypan: Show saved PAN cards
+    - /removepan: Clear saved PAN cards
+    - /check [IPO] [PANS]: On-demand allotment check
+    - /help: Show command help
     """
     token = Config.TELEGRAM_BOT_TOKEN
     if not token:
@@ -110,6 +138,8 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
             logger.warning(f"Error checking Telegram getUpdates (attempt {attempt}/3): {e}")
             time.sleep(attempt * 2)
 
+    has_registry_changes = False
+
     for update in updates:
         uid = update.get("update_id", 0)
         if uid > max_update_id:
@@ -128,40 +158,194 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
         full_name = f"{first} {last}".strip()
         display_name = f"{full_name} (@{uname})" if uname else full_name
 
+        text = msg.get("text", "").strip()
+
+        # 1. Enrol new subscriber if not in registry
         if cid not in registry:
             logger.info(f"New Telegram subscriber detected: {display_name} (ID: {cid})")
             user_info = {
                 "name": display_name,
-                "role": "member"
+                "role": "member",
+                "pans": []
             }
             registry[cid] = user_info
             new_subscribers.append({"id": cid, "name": display_name})
+            has_registry_changes = True
 
-            # 1. Send welcome message to the new user
-            welcome_msg = (
-                f"🎉 Welcome to Paunwala IPO Alerts, {first or 'Investor'}!\n\n"
-                "You are now subscribed to receive daily Indian Mainboard IPO alerts:\n"
-                "• 08:00 AM IST: Morning Alert (GMP > 10%)\n"
-                "• 12:30 PM IST: Reminder Alert (IPOs closing today)\n\n"
-                "📲 You'll get direct 1-click apply links for Kite, Upstox, Groww, and Sharekhan!\n\n"
-                "🎁 Don't have a Demat Account yet? Open free & start applying:\n"
-                f"• Zerodha Kite: {Config.ZERODHA_REFERRAL_URL}\n"
-                f"• Upstox (Zero AMC & Margin perks): {Config.UPSTOX_REFERRAL_URL}\n"
-                f"• Groww (Code: {Config.GROWW_REFERRAL_CODE}): {Config.GROWW_REFERRAL_URL}"
+            welcome_lines = [
+                f"🎉 <b>Welcome to Paunwala IPO Alerts, {first or 'Investor'}!</b>",
+                "",
+                "You are now subscribed to receive daily Indian Mainboard IPO alerts:",
+                "• <b>08:00 AM IST:</b> Morning Alert (GMP &gt; 10%)",
+                "• <b>12:30 PM IST:</b> Reminder Alert (IPOs closing today)",
+                "• <b>10:00 PM IST:</b> Nightly Allotment Declaration Alert",
+                "",
+                "🤖 <b>Automated Allotment Checks:</b>",
+                "Save your PAN cards now to get instant, automatic allotment status:",
+                "👉 <code>/pan ABCDE1234F, BCDEF2345G</code>",
+                "",
+                "────────────────────────",
+                "🎁 <b>Open Free Demat Account:</b>",
+                f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>',
+                f'• <a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a> (Zero AMC)',
+                f'• <a href="{Config.GROWW_REFERRAL_URL}">Groww</a> (Code: <code>{Config.GROWW_REFERRAL_CODE}</code>)'
+            ]
+            welcome_msg = "\n".join(welcome_lines)
+
+            _telegram_post_with_retry(
+                token,
+                {"chat_id": cid, "text": welcome_msg, "parse_mode": "HTML", "disable_web_page_preview": True}
             )
-            _telegram_post_with_retry(token, {"chat_id": cid, "text": welcome_msg})
 
-            # 2. Inform the Admin
             if notify_admin and admin_id and cid != admin_id:
-                admin_alert = (
-                    "🔔 [ADMIN NOTIFICATION] New Subscriber Joined!\n\n"
-                    f"👤 Name: {display_name}\n"
-                    f"🆔 Chat ID: {cid}\n\n"
-                    "✅ They have been automatically enrolled to receive daily IPO & GMP alerts!"
+                admin_lines = [
+                    "🔔 <b>[ADMIN] New Subscriber Joined!</b>",
+                    "",
+                    f"👤 Name: <b>{display_name}</b>",
+                    f"🆔 Chat ID: <code>{cid}</code>",
+                    "✅ Automatically enrolled for all daily alerts."
+                ]
+                _telegram_post_with_retry(
+                    token,
+                    {"chat_id": admin_id, "text": "\n".join(admin_lines), "parse_mode": "HTML"}
                 )
-                _telegram_post_with_retry(token, {"chat_id": admin_id, "text": admin_alert})
 
-    # Acknowledge processed updates with Telegram server so they are never returned again
+        # 2. Process Interactive Commands
+        if not text:
+            continue
+
+        cmd_lower = text.lower()
+
+        # Command: /pan <PANS> or pan <PANS>
+        if cmd_lower.startswith("/pan") or cmd_lower.startswith("pan "):
+            pans = extract_pans(text)
+            if pans:
+                existing = registry[cid].get("pans", [])
+                merged = []
+                seen = set()
+                for p in existing + pans:
+                    if p not in seen:
+                        seen.add(p)
+                        merged.append(p)
+
+                registry[cid]["pans"] = merged
+                has_registry_changes = True
+
+                masked_list = [f"• <code>{mask_pan(p)}</code>" for p in merged]
+                reply_lines = [
+                    f"✅ <b>Saved {len(merged)} PAN Card(s) for your account:</b>",
+                    ""
+                ]
+                reply_lines.extend(masked_list)
+                reply_lines.extend([
+                    "",
+                    "💡 <i>Whenever an IPO allotment without captcha is declared at 10:00 PM, all your PANs will be auto-checked!</i>",
+                    "",
+                    "To check allotment status right now, reply: <code>/check</code>"
+                ])
+                reply = "\n".join(reply_lines)
+            else:
+                reply_lines = [
+                    "❌ <b>No valid PAN cards found.</b>",
+                    "",
+                    "Please enter 10-character Indian PAN cards:",
+                    "👉 <code>/pan ABCDE1234F</code>",
+                    "👉 <code>/pan ABCDE1234F, BCDEF2345G</code>"
+                ]
+                reply = "\n".join(reply_lines)
+            _telegram_post_with_retry(token, {"chat_id": cid, "text": reply, "parse_mode": "HTML"})
+
+        # Command: /mypan or /pans
+        elif cmd_lower in ("/mypan", "/pans", "mypan", "pans"):
+            saved = registry[cid].get("pans", [])
+            if saved:
+                masked_list = [f"• <code>{mask_pan(p)}</code>" for p in saved]
+                reply_lines = [
+                    f"📋 <b>Your Registered PAN Cards ({len(saved)}):</b>",
+                    ""
+                ]
+                reply_lines.extend(masked_list)
+                reply_lines.extend([
+                    "",
+                    "👉 To add more: <code>/pan &lt;PAN&gt;</code>",
+                    "👉 To clear all: <code>/removepan</code>",
+                    "👉 To check allotment: <code>/check</code>"
+                ])
+                reply = "\n".join(reply_lines)
+            else:
+                reply_lines = [
+                    "ℹ️ <b>You have no saved PAN cards yet.</b>",
+                    "",
+                    "Save your PANs now for automatic allotment alerts:",
+                    "👉 <code>/pan ABCDE1234F, BCDEF2345G</code>"
+                ]
+                reply = "\n".join(reply_lines)
+            _telegram_post_with_retry(token, {"chat_id": cid, "text": reply, "parse_mode": "HTML"})
+
+        # Command: /removepan or /clearpan
+        elif cmd_lower in ("/removepan", "/clearpan", "removepan", "clearpan"):
+            registry[cid]["pans"] = []
+            has_registry_changes = True
+            reply = "🗑️ <b>All saved PAN cards have been removed from your account.</b>"
+            _telegram_post_with_retry(token, {"chat_id": cid, "text": reply, "parse_mode": "HTML"})
+
+        # Command: /check [IPO] [PANS]
+        elif cmd_lower.startswith("/check") or cmd_lower.startswith("check"):
+            import re
+            extracted_pans = extract_pans(text)
+            company_query = None
+
+            cleaned_text = re.sub(r"^/check\s*|^check\s*", "", text, flags=re.IGNORECASE)
+            for p in extracted_pans:
+                cleaned_text = re.sub(re.escape(p), "", cleaned_text, flags=re.IGNORECASE)
+            cleaned_text = cleaned_text.replace(",", " ").strip()
+            if cleaned_text:
+                company_query = cleaned_text
+
+            query_pans = extracted_pans or registry[cid].get("pans", [])
+
+            if not query_pans:
+                reply_lines = [
+                    "ℹ️ <b>Please provide a PAN number to check.</b>",
+                    "",
+                    "Examples:",
+                    "• Check on-the-fly: <code>/check ABCDE1234F</code>",
+                    "• Save PANs once for auto-checking: <code>/pan ABCDE1234F, BCDEF2345G</code>"
+                ]
+                reply = "\n".join(reply_lines)
+                _telegram_post_with_retry(token, {"chat_id": cid, "text": reply, "parse_mode": "HTML"})
+            else:
+                _telegram_post_with_retry(
+                    token,
+                    {"chat_id": cid, "text": "🔍 <i>Checking allotment status across registrars...</i>", "parse_mode": "HTML"}
+                )
+                res = batch_check_pans(company_query, query_pans)
+                report = format_allotment_report(res)
+                _telegram_post_with_retry(
+                    token,
+                    {"chat_id": cid, "text": report, "parse_mode": "HTML", "disable_web_page_preview": True}
+                )
+
+        # Command: /help
+        elif cmd_lower in ("/help", "help", "/commands"):
+            help_lines = [
+                "🤖 <b>Paunwala IPO Bot Commands:</b>",
+                "",
+                "• <code>/pan &lt;PAN1&gt;, &lt;PAN2&gt;</code> — Save single or multiple PAN cards",
+                "• <code>/mypan</code> — View your saved PAN cards",
+                "• <code>/removepan</code> — Clear your saved PAN cards",
+                "• <code>/check</code> — Check allotment for your saved PANs",
+                "• <code>/check &lt;COMPANY&gt; &lt;PAN&gt;</code> — Check specific company &amp; PAN",
+                "• <code>/help</code> — Show this help message",
+                "",
+                "⏰ <b>Scheduled Alerts:</b>",
+                "• 8:00 AM IST: High-GMP Morning Alert",
+                "• 12:30 PM IST: Closing Today Reminder",
+                "• 10:00 PM IST: Nightly Allotment Declaration Alert"
+            ]
+            help_msg = "\n".join(help_lines)
+            _telegram_post_with_retry(token, {"chat_id": cid, "text": help_msg, "parse_mode": "HTML"})
+
     if max_update_id > 0:
         try:
             requests.get(f"{url}?offset={max_update_id + 1}&limit=1", timeout=60)
@@ -169,30 +353,25 @@ def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
         except Exception as e:
             logger.debug(f"Could not acknowledge getUpdates offset {max_update_id + 1}: {e}")
 
-    if new_subscribers:
+    if has_registry_changes or new_subscribers:
         save_subscribers_registry(registry)
-        logger.info(f"Registered and saved {len(new_subscribers)} new subscriber(s).")
+        logger.info(f"Subscribers registry updated successfully.")
 
     return new_subscribers
 
 
-def deactivate_subscriber(chat_id: str, reason: str = "blocked"):
-    """Mark a subscriber as inactive / blocked so we don't attempt sending to them."""
-    cid = str(chat_id).strip()
-    registry = load_subscribers_registry()
-    if cid in registry:
-        registry[cid]["status"] = reason
-        save_subscribers_registry(registry)
-        logger.info(f"Subscriber {cid} marked as {reason}.")
+def sync_new_subscribers(notify_admin: bool = True) -> List[Dict[str, Any]]:
+    """Backward-compatible wrapper calling process_incoming_telegram_updates."""
+    return process_incoming_telegram_updates(notify_admin=notify_admin)
 
 
 def get_all_active_chat_ids() -> List[str]:
     """
     Get all active Telegram Chat IDs combining .env and subscribers.json.
-    Also runs sync to catch any newly joined users.
+    Also processes updates to catch any newly joined users or commands.
     Excludes any blocked/inactive users.
     """
-    sync_new_subscribers(notify_admin=True)
+    process_incoming_telegram_updates(notify_admin=True)
     registry = load_subscribers_registry()
 
     all_ids = set()
@@ -206,4 +385,3 @@ def get_all_active_chat_ids() -> List[str]:
             all_ids.add(cid_str)
 
     return list(all_ids)
-

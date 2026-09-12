@@ -7,7 +7,7 @@ import sys
 import os
 from datetime import datetime
 from typing import List, Dict, Any
-from .base import BaseNotifier
+from .base import BaseNotifier, strip_html
 from config import Config
 
 
@@ -20,7 +20,8 @@ class ConsoleNotifier(BaseNotifier):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         divider = "=" * 70
 
-        output = f"\n{divider}\n[NOTIFICATION DISPATCH] at {timestamp}\nRecipients: {', '.join(recipients)}\n{divider}\n{message}\n{divider}\n"
+        clean_msg = strip_html(message)
+        output = f"\n{divider}\n[NOTIFICATION DISPATCH] at {timestamp}\nRecipients: {', '.join(recipients)}\n{divider}\n{clean_msg}\n{divider}\n"
         print(output)
 
         # Log to file

@@ -3,7 +3,7 @@ name: Indian IPO Tracker & GMP Alerts
 on:
   # 1. Instant External Webhooks (cron-job.org / curl / API) - 0 queue delay
   repository_dispatch:
-    types: [morning_check, reminder_check, allotment_check]
+    types: [morning_check, reminder_check, allotment_check, nightly_allotment_check]
 
   # 2. Manual trigger from GitHub UI anytime
   workflow_dispatch:
@@ -24,6 +24,8 @@ on:
     - cron: '25 2 * * *'
     # 06:55 UTC is 12:25 PM IST
     - cron: '55 6 * * *'
+    # 16:25 UTC is 09:55 PM IST (Window for 10:00 PM IST Nightly Check)
+    - cron: '25 16 * * *'
 
 jobs:
   check-and-alert:
@@ -79,8 +81,8 @@ jobs:
             if [ "$EVENT_ACTION" = "reminder_check" ]; then
               echo "🚀 Executing 12:30 PM Reminder Check (via Webhook)..."
               python main.py --run-reminder
-            elif [ "$EVENT_ACTION" = "allotment_check" ]; then
-              echo "🚀 Executing Allotment Check (via Webhook)..."
+            elif [ "$EVENT_ACTION" = "allotment_check" ] || [ "$EVENT_ACTION" = "nightly_allotment_check" ]; then
+              echo "🚀 Executing 10:00 PM Nightly Allotment Check (via Webhook)..."
               python main.py --check-allotment
             else
               echo "🚀 Executing 8:00 AM Morning Check (via Webhook)..."
@@ -115,6 +117,10 @@ jobs:
             elif [ "$TOTAL_MIN" -ge 410 ] && [ "$TOTAL_MIN" -le 465 ]; then
               echo "⏰ Executing Scheduled Reminder 12:30 PM IST Check..."
               python main.py --run-reminder --skip-if-already-dispatched
+            # Nightly window: 16:20 UTC to 17:15 UTC (9:50 PM to 10:45 PM IST)
+            elif [ "$TOTAL_MIN" -ge 980 ] && [ "$TOTAL_MIN" -le 1035 ]; then
+              echo "⏰ Executing Scheduled Nightly 10:00 PM IST Allotment Check..."
+              python main.py --check-allotment
             else
               echo "⚠️ SKIPPING: GitHub Actions runner queue delay exceeded 30 minutes."
               echo "Stale alert suppressed to prevent delayed notifications."

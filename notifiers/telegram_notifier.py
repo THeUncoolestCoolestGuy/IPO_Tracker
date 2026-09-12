@@ -1,10 +1,12 @@
 """
 Telegram Bot Notifier.
 Sends instant free push notifications to mobile phones via Telegram.
+Supports HTML formatting and disabled link previews for clean, airy, visually appealing alerts.
 """
 
+import time
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import requests
 from .base import BaseNotifier
 from config import Config
@@ -21,7 +23,75 @@ class TelegramNotifier(BaseNotifier):
     def name(self) -> str:
         return "telegram"
 
+    def send_direct(
+        self,
+        chat_id: str,
+        message: str,
+        parse_mode: Optional[str] = "HTML",
+        disable_preview: bool = True,
+        max_retries: int = 3,
+        timeout: int = 60
+    ) -> bool:
+        """
+        Send a direct message to an individual Telegram chat ID.
+        Attempts HTML formatting first; gracefully falls back to plain text if markup fails.
+        """
+        if not self.bot_token:
+            return False
+
+        api_url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+        payload = {
+            "chat_id": str(chat_id).strip(),
+            "text": message,
+            "disable_web_page_preview": disable_preview
+        }
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                res = requests.post(api_url, json=payload, timeout=timeout)
+                data = res.json()
+                if data.get("ok"):
+                    return True
+
+                error_code = data.get("error_code")
+                desc = data.get("description", "")
+
+                # Fallback to plain text if Telegram cannot parse HTML entities
+                if error_code == 400 and "can't parse" in desc.lower() and "parse_mode" in payload:
+                    logger.warning(f"Telegram parse error for {chat_id}: {desc}. Retrying as plain text.")
+                    payload.pop("parse_mode", None)
+                    continue
+
+                if error_code in (400, 403):
+                    logger.warning(f"Telegram permanent failure for {chat_id} (code {error_code}): {desc}")
+                    if error_code == 403:
+                        try:
+                            from subscriber_manager import deactivate_subscriber
+                            deactivate_subscriber(chat_id, "blocked")
+                        except Exception:
+                            pass
+                    return False
+
+                if error_code == 429:
+                    retry_after = data.get("parameters", {}).get("retry_after", 3)
+                    time.sleep(retry_after)
+                    continue
+
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                logger.warning(f"Telegram network issue sending to {chat_id} (attempt {attempt}/{max_retries}): {e}")
+            except Exception as e:
+                logger.error(f"Telegram unexpected error for {chat_id}: {e}")
+                return False
+
+            if attempt < max_retries:
+                time.sleep(attempt * 2)
+
+        return False
+
     def send(self, recipients: List[str], message: str) -> Dict[str, Any]:
+        """Broadcast alert to all active subscribers."""
         if not self.bot_token:
             logger.warning("Telegram bot token not configured in .env. Skipping Telegram.")
             return {
@@ -49,71 +119,20 @@ class TelegramNotifier(BaseNotifier):
                 "error": "No Telegram chat IDs configured"
             }
 
-        import time
-
-        api_url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
         delivered = []
         failed = []
-        last_error = None
-        max_retries = 3
-        timeout_seconds = 60
 
         for chat_id in target_ids:
-            payload = {
-                "chat_id": chat_id,
-                "text": message
-            }
-            sent = False
-            for attempt in range(1, max_retries + 1):
-                try:
-                    res = requests.post(api_url, json=payload, timeout=timeout_seconds)
-                    data = res.json()
-                    if data.get("ok"):
-                        delivered.append(chat_id)
-                        sent = True
-                        break
-                    else:
-                        error_code = data.get("error_code")
-                        last_error = data.get("description", "Unknown Telegram error")
-                        logger.warning(
-                            f"Telegram error sending to {chat_id} (attempt {attempt}/{max_retries}, code {error_code}): {last_error}"
-                        )
-                        # Don't retry if user blocked bot or chat not found
-                        if error_code == 403:
-                            try:
-                                from subscriber_manager import deactivate_subscriber
-                                deactivate_subscriber(chat_id, "blocked")
-                            except Exception:
-                                pass
-                            break
-                        if error_code == 400:
-                            break
-                        if error_code == 429:
-                            retry_after = data.get("parameters", {}).get("retry_after", 3)
-                            time.sleep(retry_after)
-                            continue
-                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                    last_error = str(e)
-                    logger.warning(
-                        f"Telegram connection/timeout for {chat_id} (attempt {attempt}/{max_retries}): {e}"
-                    )
-                except Exception as e:
-                    last_error = str(e)
-                    logger.error(f"Telegram unexpected error for {chat_id}: {e}")
-                    break
-
-                if attempt < max_retries:
-                    backoff = attempt * 2
-                    time.sleep(backoff)
-
-            if not sent:
+            ok = self.send_direct(chat_id, message, parse_mode="HTML", disable_preview=True)
+            if ok:
+                delivered.append(chat_id)
+            else:
                 failed.append(chat_id)
-                logger.error(f"Telegram failed to send to {chat_id} after {max_retries} attempts: {last_error}")
 
         return {
             "channel": self.name,
             "success": len(delivered) > 0,
             "delivered": delivered,
             "failed": failed,
-            "error": last_error
+            "error": None if len(delivered) > 0 else "All dispatches failed"
         }
