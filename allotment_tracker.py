@@ -210,6 +210,68 @@ def check_and_notify_new_allotments(dry_run: bool = False, force_check: bool = F
     }
 
 
+def get_active_allotment_pipeline(max_days_ago: int = 6) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Intelligent Allotment Window Pipeline:
+    Cross-references Mainboard IPOs that closed in the last 1-6 days
+    against live registrar lists (KFintech, Link Intime, Bigshare).
+    Categorizes them into:
+    - kfin_ready: Live on KFintech (eligible for automatic multi-PAN checks)
+    - captcha_live: Live on Link Intime / Bigshare (1-click portal links provided)
+    - pending: Closed within last 1-5 days, allotment expected any moment
+    """
+    from scraper import get_all_mainboard_ipos
+    from pan_checker import find_ipo_by_name
+
+    ipos = get_all_mainboard_ipos()
+    today = datetime.now()
+
+    recent_closed = []
+    for ipo in ipos:
+        last_date_str = ipo.get("last_filing_date", "")
+        m = re.search(r"(\d+)\s+([A-Za-z]+)", last_date_str)
+        if m:
+            day = int(m.group(1))
+            month_str = m.group(2)[:3]
+            try:
+                closing_dt = datetime.strptime(f"{day} {month_str} {today.year}", "%d %b %Y")
+                diff_days = (today - closing_dt).days
+                if 0 <= diff_days <= max_days_ago and ipo.get("status", "").lower() == "closed":
+                    recent_closed.append({
+                        "name": ipo["name"],
+                        "last_filing_date": last_date_str,
+                        "days_ago": diff_days
+                    })
+            except Exception:
+                pass
+
+    from allotment_scraper import get_all_live_allotments
+    all_live = get_all_live_allotments()
+
+    kfin_ready = []
+    captcha_live = []
+    pending = []
+
+    for ipo in recent_closed:
+        matched = find_ipo_by_name(ipo["name"], all_ipos=all_live)
+        if matched:
+            matched_copy = dict(matched)
+            matched_copy["days_ago"] = ipo["days_ago"]
+            matched_copy["last_filing_date"] = ipo["last_filing_date"]
+            if matched.get("registrar") == "KFin Technologies":
+                kfin_ready.append(matched_copy)
+            else:
+                captcha_live.append(matched_copy)
+        else:
+            pending.append(ipo)
+
+    return {
+        "kfin_ready": kfin_ready,
+        "captcha_live": captcha_live,
+        "pending": pending
+    }
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     print("Testing Allotment Tracker...")

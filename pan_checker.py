@@ -147,12 +147,17 @@ def check_kfintech_pan(company_id: str, pan: str, timeout: int = 25) -> Dict[str
         }
 
 
-def find_ipo_by_name(query: str) -> Optional[Dict[str, Any]]:
+def find_ipo_by_name(query: str, all_ipos: Optional[List[Dict[str, Any]]] = None) -> Optional[Dict[str, Any]]:
     """
     Search active IPOs across registrars matching query string.
+    Optionally accepts pre-fetched all_ipos to avoid redundant HTTP requests.
     """
-    from allotment_scraper import get_all_live_allotments
-    ipos = get_all_live_allotments()
+    if all_ipos is None:
+        from allotment_scraper import get_all_live_allotments
+        ipos = get_all_live_allotments()
+    else:
+        ipos = all_ipos
+
     if not ipos:
         return None
 
@@ -236,19 +241,30 @@ def batch_check_pans(company_query: Optional[str], pans: List[str]) -> Dict[str,
 
 def check_all_recent_ipos(pans: List[str], max_ipos: int = 6) -> List[Dict[str, Any]]:
     """
-    Check PANs across the top recent active equity IPOs on KFintech.
+    Check PANs across the recent active equity IPOs in the allotment window.
+    Uses get_active_allotment_pipeline() to dynamically find which IPOs closed recently.
     Returns allotment results for all IPOs where actual applications were found.
-    If no applications were found in any recent IPO, returns the single newest IPO.
     """
     if not pans:
         return []
 
+    from allotment_tracker import get_active_allotment_pipeline
+    pipeline = get_active_allotment_pipeline()
+    kfin_ipos = list(pipeline.get("kfin_ready", []))
+
+    # Include recent equity IPOs from KFintech as fallback/additional check
     from allotment_scraper import get_kfintech_ipos
-    kfin_ipos = get_kfintech_ipos()
-    recent_equity = [k for k in kfin_ipos if "ncd" not in k["name"].lower()][:max_ipos]
+    raw_kfin = get_kfintech_ipos()
+    seen_ids = {k.get("company_id") for k in kfin_ipos}
+    for k in raw_kfin:
+        if "ncd" not in k["name"].lower() and k.get("company_id") not in seen_ids:
+            kfin_ipos.append(k)
+            seen_ids.add(k.get("company_id"))
+        if len(kfin_ipos) >= max_ipos:
+            break
 
     found_reports = []
-    for ipo in recent_equity:
+    for ipo in kfin_ipos:
         company_id = ipo.get("company_id", "")
         company_name = ipo.get("name", "Unknown IPO")
         results = []
@@ -273,8 +289,8 @@ def check_all_recent_ipos(pans: List[str], max_ipos: int = 6) -> List[Dict[str, 
     if found_reports:
         return found_reports
 
-    if recent_equity:
-        return [batch_check_pans(recent_equity[0], pans)]
+    if kfin_ipos:
+        return [batch_check_pans(kfin_ipos[0], pans)]
 
     return []
 

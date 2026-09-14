@@ -354,12 +354,41 @@ def process_incoming_telegram_updates(notify_admin: bool = True) -> List[Dict[st
                     )
                 else:
                     from pan_checker import check_all_recent_ipos
+                    from allotment_tracker import get_active_allotment_pipeline
+                    pipeline = get_active_allotment_pipeline()
                     reports = check_all_recent_ipos(query_pans)
                     for r in reports:
                         report = format_allotment_report(r)
                         _telegram_post_with_retry(
                             token,
                             {"chat_id": cid, "text": report, "parse_mode": "HTML", "disable_web_page_preview": True}
+                        )
+
+                    captcha_live = pipeline.get("captcha_live", [])
+                    pending = pipeline.get("pending", [])
+                    if captcha_live or pending:
+                        overview_lines = [
+                            "📋 <b>Recent Mainboard Allotment Tracker:</b>",
+                            ""
+                        ]
+                        if captcha_live:
+                            overview_lines.append("🏛️ <b>Allotments LIVE on Link Intime / Bigshare:</b>")
+                            for c in captcha_live:
+                                portal = c.get("portal_url", "")
+                                reg = c.get("registrar", "")
+                                overview_lines.append(f'• <a href="{portal}">{c["name"]}</a> ({reg})')
+                            overview_lines.append("")
+
+                        if pending:
+                            overview_lines.append("⏳ <b>Closed Recently (Allotment Awaited):</b>")
+                            for p in pending:
+                                overview_lines.append(f'• {p["name"]} (Closed: {p["last_filing_date"]})')
+                            overview_lines.append("")
+
+                        overview_lines.append("💡 <i>To check a specific IPO directly:</i>\n👉 <code>/check &lt;company&gt;</code> (e.g. <code>/check kanohar</code>)")
+                        _telegram_post_with_retry(
+                            token,
+                            {"chat_id": cid, "text": "\n".join(overview_lines).strip(), "parse_mode": "HTML", "disable_web_page_preview": True}
                         )
 
         # Command: /help
