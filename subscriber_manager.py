@@ -63,12 +63,17 @@ def _telegram_post_with_retry(
 
 
 def load_subscribers_registry() -> Dict[str, Dict[str, Any]]:
-    """Load the subscriber registry from data/subscribers.json."""
+    """Load the subscriber registry from data/subscribers.json and decrypt PAN cards in memory."""
+    from crypto_utils import decrypt_pan
+
     if SUBSCRIBERS_FILE.exists():
         try:
             with open(SUBSCRIBERS_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if isinstance(data, dict) and data:
+                    for cid, u in data.items():
+                        if "pans" in u and isinstance(u["pans"], list):
+                            u["pans"] = [decrypt_pan(p) for p in u["pans"] if p]
                     return data
         except Exception as e:
             logger.error(f"Error loading subscribers.json: {e}")
@@ -89,11 +94,19 @@ def load_subscribers_registry() -> Dict[str, Dict[str, Any]]:
 
 
 def save_subscribers_registry(registry: Dict[str, Dict[str, Any]]):
-    """Save the subscriber registry to data/subscribers.json."""
+    """Save the subscriber registry to data/subscribers.json, encrypting PAN cards for privacy."""
     try:
+        from crypto_utils import encrypt_pan
+        encrypted_copy = {}
+        for cid, u in registry.items():
+            u_copy = dict(u)
+            if "pans" in u_copy and isinstance(u_copy["pans"], list):
+                u_copy["pans"] = [encrypt_pan(p) for p in u_copy["pans"] if p]
+            encrypted_copy[cid] = u_copy
+
         Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
         with open(SUBSCRIBERS_FILE, "w", encoding="utf-8") as f:
-            json.dump(registry, f, indent=2, ensure_ascii=False)
+            json.dump(encrypted_copy, f, indent=2, ensure_ascii=False)
     except Exception as e:
         logger.error(f"Error saving subscribers.json: {e}")
 
