@@ -134,16 +134,23 @@ def main():
         print("✅ Telegram sync completed.")
 
     elif args.check_pan:
-        from pan_checker import extract_pans, batch_check_pans, format_allotment_report
+        from pan_checker import extract_pans, batch_check_pans, check_all_recent_ipos, format_allotment_report
         pan_list = extract_pans(args.pans) if args.pans else []
         if not pan_list:
             print("❌ No valid PAN numbers specified. Use --pans ABCDE1234F,BCDEF2345G")
             return
 
-        print(f"▶ Checking {len(pan_list)} PAN(s) for company: {args.company or 'Latest KFintech IPO'}...")
-        res = batch_check_pans(args.company, pan_list)
-        report = format_allotment_report(res)
-        print("\n" + strip_html(report) + "\n")
+        if args.company:
+            print(f"▶ Checking {len(pan_list)} PAN(s) for company: {args.company}...")
+            res = batch_check_pans(args.company, pan_list)
+            report = format_allotment_report(res)
+            print("\n" + strip_html(report) + "\n")
+        else:
+            print(f"▶ Checking {len(pan_list)} PAN(s) across recent active IPOs...")
+            reports = check_all_recent_ipos(pan_list)
+            for r in reports:
+                report = format_allotment_report(r)
+                print("\n" + strip_html(report) + "\n")
 
     elif args.admin_report:
         print("▶ Sending Daily Subscriber Report to Admin...")

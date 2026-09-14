@@ -234,6 +234,51 @@ def batch_check_pans(company_query: Optional[str], pans: List[str]) -> Dict[str,
     }
 
 
+def check_all_recent_ipos(pans: List[str], max_ipos: int = 6) -> List[Dict[str, Any]]:
+    """
+    Check PANs across the top recent active equity IPOs on KFintech.
+    Returns allotment results for all IPOs where actual applications were found.
+    If no applications were found in any recent IPO, returns the single newest IPO.
+    """
+    if not pans:
+        return []
+
+    from allotment_scraper import get_kfintech_ipos
+    kfin_ipos = get_kfintech_ipos()
+    recent_equity = [k for k in kfin_ipos if "ncd" not in k["name"].lower()][:max_ipos]
+
+    found_reports = []
+    for ipo in recent_equity:
+        company_id = ipo.get("company_id", "")
+        company_name = ipo.get("name", "Unknown IPO")
+        results = []
+        has_any_application = False
+        for idx, pan in enumerate(pans):
+            res = check_kfintech_pan(company_id=company_id, pan=pan)
+            results.append(res)
+            if res.get("status") in ("ALLOTTED", "NOT_ALLOTTED"):
+                has_any_application = True
+            if idx < len(pans) - 1:
+                time.sleep(0.15)
+
+        if has_any_application:
+            found_reports.append({
+                "success": True,
+                "captcha_required": False,
+                "company_name": company_name,
+                "registrar": "KFin Technologies",
+                "results": results
+            })
+
+    if found_reports:
+        return found_reports
+
+    if recent_equity:
+        return [batch_check_pans(recent_equity[0], pans)]
+
+    return []
+
+
 def format_allotment_report(batch_response: Dict[str, Any]) -> str:
     """
     Format clean, visually appealing, airy Telegram HTML report for batch PAN results.
@@ -305,6 +350,8 @@ def format_allotment_report(batch_response: Dict[str, Any]) -> str:
     lines.append(
         f"📊 <b>Summary:</b> 🟢 {allotted_count} Allotted  •  🔴 {not_allotted_count} Not Allotted  •  ⚪ {not_found_count} Not Found"
     )
+    lines.append("")
+    lines.append("💡 <i>Check any other IPO by name:</i>\n👉 <code>/check &lt;company&gt;</code> (e.g. <code>/check pranav</code> or <code>/check kanohar</code>)")
 
     return "\n".join(lines)
 

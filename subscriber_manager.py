@@ -343,14 +343,24 @@ def process_incoming_telegram_updates(notify_admin: bool = True) -> List[Dict[st
             else:
                 _telegram_post_with_retry(
                     token,
-                    {"chat_id": cid, "text": "🔍 <i>Checking allotment status across registrars...</i>", "parse_mode": "HTML"}
+                    {"chat_id": cid, "text": "🔍 <i>Checking allotment status across active IPOs...</i>", "parse_mode": "HTML"}
                 )
-                res = batch_check_pans(company_query, query_pans)
-                report = format_allotment_report(res)
-                _telegram_post_with_retry(
-                    token,
-                    {"chat_id": cid, "text": report, "parse_mode": "HTML", "disable_web_page_preview": True}
-                )
+                if company_query:
+                    res = batch_check_pans(company_query, query_pans)
+                    report = format_allotment_report(res)
+                    _telegram_post_with_retry(
+                        token,
+                        {"chat_id": cid, "text": report, "parse_mode": "HTML", "disable_web_page_preview": True}
+                    )
+                else:
+                    from pan_checker import check_all_recent_ipos
+                    reports = check_all_recent_ipos(query_pans)
+                    for r in reports:
+                        report = format_allotment_report(r)
+                        _telegram_post_with_retry(
+                            token,
+                            {"chat_id": cid, "text": report, "parse_mode": "HTML", "disable_web_page_preview": True}
+                        )
 
         # Command: /help
         elif cmd_lower in ("/help", "help", "/commands"):
