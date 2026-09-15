@@ -3,20 +3,22 @@
     "name": "The uncoolest coolest guy",
     "role": "admin",
     "pans": [
-      "enc:gAAAAABqqDyGOeSEhqLukjtTrr9XHDC_0piMqNvCfb8kBUKsjb9eMxAOMYvjwBtPuaxwxVO8ttmdHHRNUcUNGj-07k81Iet4PA==",
-      "enc:gAAAAABqqDyGO_iskGZvQhb6kg04HnIAPwNCHXzJEp9KYUU-naMHYEB8d6Fb7KEioUmGkCmHPhlH8er0J6ChWnf0cV15nAdg3w==",
-      "enc:gAAAAABqqDyG4KfNRc7ixYeMIQ2YzGC95Xy0BTqOCzmaVIGybJPL1PkoHki5CWcgFGQmfs9f2ewOvI82IJnTi5smNQxUCFuvFg==",
-      "enc:gAAAAABqqDyG2lDNKWwlPS97o6rY8SsYeApau_57Ckd8uHDQzUKpHYlrkFBvsBXFphGuNcOS_ZndMw0sncnI-koRGV0dsug2KQ==",
-      "enc:gAAAAABqqDyGXEbnqjxKaMxtHoDa2NkAYb52iR7vU9dKohj5nHCGMgm7GEUbYlxTcpEusWlCsK9_MKz4uyCRUZ5YSfykfbruSg==",
-      "enc:gAAAAABqqDyGsoEHJ8YjBeh_8y5dSWeE_5Fj6VDuRxG1ESfwh0QKJnVpWWBlfEXsd-VYlP5i70tkKl3IsR3OfHUocMLEOJQctQ==",
-      "enc:gAAAAABqqDyG9t14yd_fksPE55LuKBTS82KG_EctVY5FOoqjjGJpJjiDywvHeRE4XzO5HbPuNWbuQ36jq0XIW9EwOQi0TPWljQ=="
+      "enc:gAAAAABqqO0rrH0FV3gGmJ45vy83Z4u5yuq5f0Jl3a7DMxkH-uSLN3-7QcKGLni3wPXaqp5nBX1uvpCWORfQZPLi3DfRl7eHbw==",
+      "enc:gAAAAABqqO0rkhERaVND0hIpplg-lZNm69O5YIG79HM6ZIfJhs639HeO8xdp6Lys9Mj_43QWN8MBAt7rGQTPAgdG_KE3PYK0Gw==",
+      "enc:gAAAAABqqO0r8ohEAXSKZV1bjD-inl1kq-9MjTrG-Ejserqo5-2t0VIEyppKVt4QIkBQckYHzNSupG0_M3gEWtzR-ySMv5-41w==",
+      "enc:gAAAAABqqO0rqqYVykuF_QcK_2g8NlOk-vPI8FybP_OffF6pFr4vlr3Lufwtd0tya8d57kPiCnlwsD_FywCYfIQVGth-hwvz-g==",
+      "enc:gAAAAABqqO0rGXwveWXGStMQWFR1G-WLzd3JzrncSshXnT8x6ATlukLTT1m__cB6MnZfxW_zJueuRrmfF9qAkLOIx29xz6HkuQ==",
+      "enc:gAAAAABqqO0ruxG0KPfPG7dXR39g93bTz8LUrAlb2OYV3ah5EKtTcYMoNf0Y4aNPSCOdKac3OQxEJGlHEzuS7Wm_8qTsRN6fTw==",
+      "enc:gAAAAABqqO0rzUbyPar_vSXdg94JIl-q0aVHQPKvXN4lJA2buIJ4XrM2Rbo5HIqzUYU18svxgVkYtHBt04bc0g7-Rv-9UoiNAQ=="
     ],
     "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "443423364": {
     "name": "Dr. Chirag Paunwala (@cpaunwala)",
     "role": "member",
-    "pans": [],
+    "pans": [
+      "enc:gAAAAABqqO0rke7hVBEz6RQ2jH-Ydanu7l5L7mtwqghBkk8B3kJYHD88YEb_wBSlUzmrnEBP6OEOv7_81qVMLxsNdWAGw0z3kg=="
+    ],
     "joined_at": "2026-09-08T10:00:00+05:30"
   },
   "810585239": {
