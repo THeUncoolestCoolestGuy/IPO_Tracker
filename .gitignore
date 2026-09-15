@@ -20,6 +20,7 @@ data/*.json
 !data/notified_allotments.json
 !data/dispatch_state.json
 !data/last_dispatch.json
+!data/cached_mainboard_ipos.json
 
 # ==============================================================================
 # PYTHON COMPILED & VIRTUAL ENVIRONMENTS

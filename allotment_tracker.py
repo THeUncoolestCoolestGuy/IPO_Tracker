@@ -11,7 +11,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Optional
 
 from config import Config
 from allotment_scraper import get_all_live_allotments
@@ -109,19 +109,55 @@ def format_allotment_alert(ipo: Dict) -> str:
     return "\n".join(lines).strip()
 
 
+def is_debt_or_excluded_issue(name: str) -> bool:
+    """
+    Exclude corporate debt instruments (NCDs, Bonds, Debentures, Tranches),
+    trusts (REIT, InVIT), rights issues, and explicit SME offerings.
+    """
+    upper = name.upper()
+    if re.search(r"\b(NCD|NCDS|BOND|BONDS|DEBENTURE|DEBENTURES|TRANCHE|RIGHTS ISSUE|REIT|INVIT)\b", upper):
+        return True
+    if re.search(r"\b(SME|SME IPO|SME-IPO)\b", upper):
+        return True
+    return False
+
+
+def parse_closing_days_ago(last_date_str: str) -> Optional[int]:
+    """Calculate how many days ago an IPO closed."""
+    if not last_date_str or last_date_str in ("-", "TBA"):
+        return None
+    m = re.search(r"(\d+)\s+([A-Za-z]+)", last_date_str)
+    if not m:
+        return None
+    day = int(m.group(1))
+    month_str = m.group(2)[:3]
+    try:
+        today = datetime.now()
+        closing_dt = datetime.strptime(f"{day} {month_str} {today.year}", "%d %b %Y")
+        return (today - closing_dt).days
+    except Exception:
+        return None
+
+
 def check_and_notify_new_allotments(dry_run: bool = False, force_check: bool = False) -> Dict:
     """
-    Check all registrars for newly published IPO allotments.
-    1. Sends general broadcast alert for each newly declared IPO.
-    2. Auto-checks all registered PAN cards for subscribers on captcha-free registrars (KFintech)
-       and delivers personalized private allotment summaries!
+    Check all registrars for newly published Mainboard IPO allotments.
+    Filters:
+    1. Only Mainboard IPOs (excludes NCDs, debt bonds, REITs, SMEs).
+    2. Only IPOs in the active allotment window (closed recently within 0 to 5 days).
+    3. Auto-checks registered subscriber PANs on KFintech and only sends DMs if
+       at least one PAN actually submitted an application (suppresses 0-app spam).
     """
-    logger.info("Scanning registrars for newly declared IPO allotments...")
+    logger.info("Scanning registrars for newly declared Mainboard IPO allotments...")
     live_ipos = get_all_live_allotments()
     if not live_ipos:
         logger.warning("No live IPOs fetched from registrars.")
         return {"status": "no_data", "count": 0, "new_allotments": []}
 
+    from scraper import get_all_mainboard_ipos
+    from pan_checker import find_ipo_by_name
+
+    mainboard_ipos = get_all_mainboard_ipos()
     registry = load_notified_allotments()
     is_first_run = len(registry) == 0 and not force_check
 
@@ -145,10 +181,34 @@ def check_and_notify_new_allotments(dry_run: bool = False, force_check: bool = F
     new_allotments = []
     for ipo in live_ipos:
         key = normalize_key(ipo["name"])
-        if key not in registry:
-            new_allotments.append(ipo)
+        if key in registry:
+            continue
 
-    logger.info(f"Detected {len(new_allotments)} newly declared allotment(s).")
+        # 1. Strictly exclude debt / NCD / bonds / trusts
+        if is_debt_or_excluded_issue(ipo["name"]):
+            logger.debug(f"Skipping non-equity/debt offering: {ipo['name']}")
+            continue
+
+        # 2. Match against Mainboard IPO list
+        matched_mb = find_ipo_by_name(ipo["name"], all_ipos=mainboard_ipos)
+        if not matched_mb:
+            logger.debug(f"Skipping non-mainboard or untracked IPO: {ipo['name']}")
+            continue
+
+        # 3. Only alert for Mainboard IPOs closing recently (within 0 to 5 days, e.g. today or 1-4 days before)
+        days_ago = parse_closing_days_ago(matched_mb.get("last_filing_date", ""))
+        status = matched_mb.get("status", "").lower()
+        if status in ("upcoming", "open"):
+            logger.info(f"Skipping open/upcoming IPO not yet in allotment window: {ipo['name']}")
+            continue
+
+        if days_ago is not None and (days_ago < 0 or days_ago > 5):
+            logger.info(f"Skipping Mainboard IPO outside recent allotment window ({days_ago} days ago): {ipo['name']}")
+            continue
+
+        new_allotments.append(ipo)
+
+    logger.info(f"Detected {len(new_allotments)} qualifying Mainboard allotment(s).")
 
     if not new_allotments:
         return {"status": "no_new_allotments", "count": 0, "new_allotments": []}
@@ -182,6 +242,13 @@ def check_and_notify_new_allotments(dry_run: bool = False, force_check: bool = F
 
                 logger.info(f"Checking {len(user_pans)} PAN(s) for user {user_data.get('name')} ({chat_id})...")
                 check_res = batch_check_pans(ipo, user_pans)
+
+                # Only send DM if at least 1 PAN actually submitted an application
+                has_apps = any(r.get("status") in ("ALLOTTED", "NOT_ALLOTTED") for r in check_res.get("results", []))
+                if not has_apps:
+                    logger.info(f"No applications found for {user_data.get('name')} in {ipo['name']}, skipping DM notification.")
+                    continue
+
                 personal_report = format_allotment_report(check_res)
 
                 if dry_run:

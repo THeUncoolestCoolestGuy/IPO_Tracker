@@ -258,9 +258,32 @@ def fetch_nse_upcoming_ipos() -> List[Dict]:
 def get_all_mainboard_ipos() -> List[Dict]:
     """
     Master function: Scrapes IPOWatch Mainboard IPOs and returns clean list.
+    Automatically caches to data/cached_mainboard_ipos.json and uses cache as fallback.
     """
+    import json
+    cache_file = Config.DATA_DIR / "cached_mainboard_ipos.json"
+
     ipos = fetch_mainboard_ipos_ipowatch()
-    return ipos
+    if ipos:
+        try:
+            Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(ipos, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logger.warning(f"Failed to save mainboard IPO cache: {e}")
+        return ipos
+
+    if cache_file.exists():
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cached = json.load(f)
+                if isinstance(cached, list) and cached:
+                    logger.info(f"Using cached mainboard IPO list ({len(cached)} items) as fallback.")
+                    return cached
+        except Exception as e:
+            logger.error(f"Error loading cached mainboard IPOs: {e}")
+
+    return []
 
 
 if __name__ == "__main__":
