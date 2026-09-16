@@ -550,5 +550,29 @@
     "registrar": "Bigshare Services",
     "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
     "notified_at": "2026-09-15T16:31:34.509175"
+  },
+  "assetreconstructioncompanyindia": {
+    "name": "Asset Reconstruction Company (India) Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "notified_at": "2026-09-16T02:30:42.984349"
+  },
+  "karamtaraengineering": {
+    "name": "Karamtara Engineering Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "notified_at": "2026-09-16T02:30:47.250411"
+  },
+  "rentomojo": {
+    "name": "RENTOMOJO LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "notified_at": "2026-09-16T02:31:00.898508"
+  },
+  "lccprojects": {
+    "name": "LCC PROJECTS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "notified_at": "2026-09-16T02:31:14.567451"
   }
 }
