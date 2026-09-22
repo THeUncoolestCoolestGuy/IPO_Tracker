@@ -598,5 +598,11 @@
     "registrar": "Bigshare Services",
     "portal_url": "https://ipo.bigshareonline.com/IPO_Status.html",
     "notified_at": "2026-09-21T16:31:04.566569"
+  },
+  "heromotors": {
+    "name": "HERO MOTORS LIMITED",
+    "registrar": "KFin Technologies",
+    "portal_url": "https://ipostatus.kfintech.com",
+    "notified_at": "2026-09-22T02:30:51.954886"
   }
 }
