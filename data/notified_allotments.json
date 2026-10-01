@@ -646,5 +646,11 @@
     "registrar": "KFin Technologies",
     "portal_url": "https://ipostatus.kfintech.com",
     "notified_at": "2026-09-30T16:30:57.404305"
+  },
+  "acevector": {
+    "name": "Acevector Limited - IPO",
+    "registrar": "Link Intime",
+    "portal_url": "https://in.mpms.mufg.com/Initial_Offer/public-issues.html",
+    "notified_at": "2026-10-01T02:30:46.704637"
   }
 }
