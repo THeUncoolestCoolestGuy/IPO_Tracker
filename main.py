@@ -103,6 +103,8 @@ def main():
     parser.add_argument("--sync-messages", action="store_true", help="Process pending Telegram commands and user messages")
     parser.add_argument("--admin-report", action="store_true", help="Send the daily subscriber update report to Admin")
     parser.add_argument("--send-admin", action="store_true", help="Send the current IPO alert privately to Admin only")
+    parser.add_argument("--run-tests", action="store_true", help="Run the comprehensive 7-suite test engine")
+    parser.add_argument("--notify-admin", action="store_true", help="Send test report to Admin on Telegram")
     parser.add_argument("--force", action="store_true", help="Force send even if already dispatched today")
     parser.add_argument("--skip-if-already-dispatched", action="store_true", help="Skip if today's alert was already dispatched")
 
@@ -180,6 +182,26 @@ def main():
                 print(f"✅ Alert successfully sent to Admin ({admin_id}) on Telegram!")
             else:
                 print(f"❌ Failed to send alert to Admin ({admin_id}). Check logs.")
+
+    elif args.run_tests:
+        print("▶ Executing Comprehensive IPO Tracker Test Suite...")
+        from test_suite import run_all_tests, send_test_report_to_admin
+        tracker = run_all_tests()
+        for group, tests in tracker.groups.items():
+            print(f"\n📁 {group}:")
+            for name, passed, detail in tests:
+                status = "✅ PASS" if passed else "❌ FAIL"
+                print(f"  {status:<8} {name}")
+        print("\n" + "=" * 60)
+        print(f"Summary: {tracker.passed_tests}/{tracker.total_tests} passed in {tracker.duration_sec:.2f}s")
+        print("=" * 60 + "\n")
+        if args.notify_admin:
+            print(f"📲 Sending Concise Test Report to Admin ({Config.ADMIN_CHAT_ID})...")
+            ok = send_test_report_to_admin(tracker)
+            if ok:
+                print("✅ Report successfully delivered to Admin on Telegram!")
+            else:
+                print("❌ Failed to deliver report to Admin.")
 
     elif args.check_allotment:
         print("▶ Executing 10:00 PM Nightly IPO Allotment Check across registrars...")
