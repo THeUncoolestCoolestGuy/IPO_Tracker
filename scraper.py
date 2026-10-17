@@ -170,23 +170,34 @@ def _recompute_ipo_status_and_closing(ipo: Dict) -> Dict:
 
 def _parse_dates(date_str: str) -> tuple[str, str]:
     """
-    Parse date range like '1-3 Sept', '10-15 Sept', '28-1 Sept', '21-23 Oct'.
+    Parse date range like '1-3 Sept', '10-15 Sept', '28-1 Sept', '21-23 Oct', 'Oct 15-19'.
     Returns (start_date, last_filing_date).
     """
     date_str = _clean_text(date_str)
     if not date_str or date_str in ("-", "TBA"):
         return ("TBA", "TBA")
 
-    # Match format like '10-15 Sept' or '21-23 Oct'
-    m1 = re.match(r"^(\d+)\s*-\s*(\d+)\s+([A-Za-z]+)$", date_str)
+    # Match format like '10-15 Sept' or '21-23 Oct' or '10 to 15 Sept'
+    m1 = re.match(r"^(\d+)\s*(?:-|to|–)\s*(\d+)\s+([A-Za-z]+)$", date_str, re.IGNORECASE)
     if m1:
         start_day, end_day, month = m1.groups()
         return (f"{start_day} {month}", f"{end_day} {month}")
 
-    # Match format like '28 Aug - 1 Sept'
-    m2 = re.match(r"^(\d+\s+[A-Za-z]+)\s*-\s*(\d+\s+[A-Za-z]+)$", date_str)
+    # Match format like '28 Aug - 1 Sept' or '28 Aug to 1 Sept'
+    m2 = re.match(r"^(\d+\s+[A-Za-z]+)\s*(?:-|to|–)\s*(\d+\s+[A-Za-z]+)$", date_str, re.IGNORECASE)
     if m2:
         return (m2.group(1), m2.group(2))
+
+    # Match format like 'Oct 15-19' or 'October 15 - 19'
+    m3 = re.match(r"^([A-Za-z]+)\s+(\d+)\s*(?:-|to|–)\s*(\d+)$", date_str, re.IGNORECASE)
+    if m3:
+        month, start_day, end_day = m3.groups()
+        return (f"{start_day} {month}", f"{end_day} {month}")
+
+    # Match format like 'Oct 15 - Oct 19'
+    m4 = re.match(r"^([A-Za-z]+\s+\d+)\s*(?:-|to|–)\s*([A-Za-z]+\s+\d+)$", date_str, re.IGNORECASE)
+    if m4:
+        return (m4.group(1), m4.group(2))
 
     return (date_str, date_str)
 
@@ -428,7 +439,10 @@ if __name__ == "__main__":
     print("\n🔍 Fetching Live Mainboard IPOs & GMP Data...\n")
     ipos = get_all_mainboard_ipos()
     print(f"Found {len(ipos)} Mainboard IPOs:\n")
-    print(f"{'IPO Name':<28} | {'Price':<10} | {'GMP (₹)':<8} | {'GMP %':<8} | {'Dates':<12} | {'Last Filing':<12} | {'Status'}")
-    print("-" * 105)
+    print(f"{'IPO Name':<28} | {'Price':<10} | {'GMP (₹)':<8} | {'GMP %':<8} | {'IPO Dates':<16} | {'Status'}")
+    print("-" * 90)
     for ipo in ipos:
-        print(f"{ipo['name'][:26]:<28} | {ipo['price_band']:<10} | ₹{ipo['gmp_rs']:<7.1f} | {ipo['gmp_percent']:>5.2f}% | {ipo['date_range']:<12} | {ipo['last_filing_date']:<12} | {ipo['status']}")
+        start = ipo.get("start_date", "")
+        end = ipo.get("last_filing_date", "")
+        dr = f"{start} - {end}" if start and end and start != end else (start or end or ipo.get("date_range", "-"))
+        print(f"{ipo['name'][:26]:<28} | {ipo['price_band']:<10} | ₹{ipo['gmp_rs']:<7.1f} | {ipo['gmp_percent']:>5.2f}% | {dr:<16} | {ipo['status']}")

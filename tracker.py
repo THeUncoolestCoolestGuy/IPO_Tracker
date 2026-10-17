@@ -96,6 +96,32 @@ def get_eligible_ipos(threshold: float = 10.0) -> List[Dict]:
     return active + upcoming
 
 
+def format_ipo_dates(ipo: Dict) -> str:
+    """
+    Format IPO dates as 'opening date - closing date' (e.g. '15 Oct – 19 Oct').
+    Falls back gracefully if only one date or a pre-formatted range is available.
+    """
+    start = ipo.get("start_date", "").strip()
+    end = ipo.get("last_filing_date", "").strip()
+    date_range = ipo.get("date_range", "").strip()
+
+    if start and end and start.upper() != "TBA" and end.upper() != "TBA":
+        if start.lower() == end.lower():
+            return start
+        return f"{start} – {end}"
+
+    if date_range and date_range not in ("-", "TBA", ""):
+        return date_range
+
+    if end and end.upper() != "TBA":
+        return f"Closes {end}"
+
+    if start and start.upper() != "TBA":
+        return f"Opens {start}"
+
+    return "TBA"
+
+
 def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[Dict]] = None) -> str:
     """
     Format clean, spacious, visually appealing 8:00 AM IST Morning Alert.
@@ -125,14 +151,14 @@ def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[D
                 price = ipo['price_band']
                 gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
                 gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-                last_date = ipo['last_filing_date']
+                ipo_dates = format_ipo_dates(ipo)
                 status = ipo['status'].upper()
                 closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
 
                 lines.append(f"<b>{idx}. {name}</b>")
                 lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
                 lines.append(f"   • <b>Price:</b> {price}")
-                lines.append(f"   • <b>Last Filing:</b> {last_date}")
+                lines.append(f"   • <b>IPO Date:</b> {ipo_dates}")
                 lines.append(f"   • <b>Status:</b> {status}")
                 lines.append("")
 
@@ -146,7 +172,8 @@ def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[D
                 gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
                 gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
                 closing_note = " ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
-                lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price}{closing_note}")
+                ipo_dates = format_ipo_dates(ipo)
+                lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price} | Date: {ipo_dates}{closing_note}")
             lines.append("")
     else:
         lines.append("ℹ️ <b>No Mainboard IPOs are currently active or closing today.</b>")
@@ -162,14 +189,13 @@ def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[D
             price = ipo['price_band']
             gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            start_date = ipo.get('start_date', 'TBA')
-            last_date = ipo.get('last_filing_date', 'TBA')
+            ipo_dates = format_ipo_dates(ipo)
             fire = " 🔥" if ipo.get("gmp_percent", 0.0) >= 15.0 else ""
 
             lines.append(f"<b>{idx}. {name}</b>")
             lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>){fire}")
             lines.append(f"   • <b>Price Band:</b> {price}")
-            lines.append(f"   • <b>Opens:</b> {start_date} | <b>Closes:</b> {last_date}")
+            lines.append(f"   • <b>IPO Date:</b> {ipo_dates}")
             lines.append("")
     elif not active_ipos:
         lines.append("────────────────────────")
@@ -214,9 +240,11 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             name = ipo['name']
             gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+            ipo_dates = format_ipo_dates(ipo)
             lines.append(f"<b>• {name}</b>")
             lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥")
             lines.append(f"   • <b>Price Band:</b> {ipo['price_band']}")
+            lines.append(f"   • <b>IPO Date:</b> {ipo_dates}")
             lines.append("   • <b>Cut-off:</b> TODAY at 5:00 PM IST")
             lines.append("")
 
@@ -249,16 +277,18 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
             for ipo in strong_open:
                 name = ipo['name']
                 gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+                ipo_dates = format_ipo_dates(ipo)
                 lines.append(f"<b>• {name}</b>")
                 lines.append(f"   • <b>GMP:</b> {gmp_pct}")
-                lines.append(f"   • <b>Last Filing Date:</b> {ipo['last_filing_date']}")
+                lines.append(f"   • <b>IPO Date:</b> {ipo_dates}")
                 lines.append("")
 
         if moderate_open:
             lines.append("📊 <b>Moderate GMP OPEN (10% – 15%):</b>")
             lines.append("")
             for ipo in moderate_open:
-                lines.append(f"• <b>{ipo['name']}</b>: GMP <b>+{ipo['gmp_percent']:.1f}%</b> | Closes: {ipo['last_filing_date']}")
+                ipo_dates = format_ipo_dates(ipo)
+                lines.append(f"• <b>{ipo['name']}</b>: GMP <b>+{ipo['gmp_percent']:.1f}%</b> | Date: {ipo_dates}")
             lines.append("")
 
         lines.append("────────────────────────")

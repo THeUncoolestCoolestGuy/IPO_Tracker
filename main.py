@@ -54,14 +54,17 @@ def list_current_ipos():
         return
 
     print(f"Found {len(ipos)} Mainboard IPO(s):\n")
-    header = f"{'#':<3} | {'IPO Name':<26} | {'Price Band':<10} | {'GMP (₹)':<8} | {'GMP %':<8} | {'Filing Date':<12} | {'Status'}"
+    header = f"{'#':<3} | {'IPO Name':<26} | {'Price Band':<10} | {'GMP (₹)':<8} | {'GMP %':<8} | {'IPO Dates':<16} | {'Status'}"
     print(header)
     print("-" * len(header))
 
     for idx, ipo in enumerate(ipos, 1):
         gmp_highlight = "🔥" if ipo['gmp_percent'] >= Config.GMP_THRESHOLD_PERCENT else "  "
         closing_mark = "⚠️" if ipo.get("closing_today") else "  "
-        print(f"{idx:<3} | {ipo['name'][:25]:<26} | {ipo['price_band']:<10} | ₹{ipo['gmp_rs']:<7.1f} | {ipo['gmp_percent']:>5.2f}% {gmp_highlight} | {ipo['last_filing_date']:<10} {closing_mark} | {ipo['status']}")
+        start = ipo.get("start_date", "")
+        end = ipo.get("last_filing_date", "")
+        dr = f"{start} - {end}" if start and end and start != end else (start or end or ipo.get("date_range", "-"))
+        print(f"{idx:<3} | {ipo['name'][:25]:<26} | {ipo['price_band']:<10} | ₹{ipo['gmp_rs']:<7.1f} | {ipo['gmp_percent']:>5.2f}% {gmp_highlight} | {dr:<16} {closing_mark} | {ipo['status']}")
 
     print("\nLegend: 🔥 = GMP exceeds threshold (>15%) | ⚠️ = Closes today\n")
 

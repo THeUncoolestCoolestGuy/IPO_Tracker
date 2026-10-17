@@ -1,7 +1,7 @@
 # 🚀 IPO Tracker — Setup Guide for Any New Device
 
 This tool automatically tracks Indian Mainboard IPOs on NSE & BSE every day and sends free alerts to your Telegram whenever the Grey Market Premium (**GMP**) is more than **10%**:
-* **08:00 AM IST:** Morning alert with all high-GMP IPOs, prices, last filing dates, and direct **1-Click Kite App** launcher links.
+* **08:00 AM IST:** Morning alert with all high-GMP IPOs, prices, IPO dates, and direct **1-Click Kite App** launcher links.
 * **12:30 PM IST:** Reminder alert highlighting high-GMP IPOs closing today before the 5:00 PM cut-off.
 
 ---
@@ -13,7 +13,7 @@ Every alert for open IPOs includes direct app launcher links for top brokers:
 3. Deepa Jewellers
    • GMP: ₹28 (+15.8%)
    • Price: ₹177
-   • Last Filing Date: 3 Sept ⚠️ (CLOSING TODAY!)
+   • IPO Date: 1 Sept – 3 Sept ⚠️ (CLOSING TODAY!)
    • Status: OPEN
    📲 Open App to Apply:
    • Kite: https://play.google.com/store/apps/details?id=com.zerodha.kite3
