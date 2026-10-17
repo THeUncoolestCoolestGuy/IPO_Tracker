@@ -102,6 +102,7 @@ def main():
     parser.add_argument("--company", type=str, default=None, help="Company name or ID for --check-pan")
     parser.add_argument("--sync-messages", action="store_true", help="Process pending Telegram commands and user messages")
     parser.add_argument("--admin-report", action="store_true", help="Send the daily subscriber update report to Admin")
+    parser.add_argument("--send-admin", action="store_true", help="Send the current IPO alert privately to Admin only")
     parser.add_argument("--force", action="store_true", help="Force send even if already dispatched today")
     parser.add_argument("--skip-if-already-dispatched", action="store_true", help="Skip if today's alert was already dispatched")
 
@@ -160,6 +161,25 @@ def main():
         from subscriber_manager import send_daily_admin_subscriber_report
         res = send_daily_admin_subscriber_report(dry_run=args.dry_run, force=args.force)
         print(f"Completed with status: {res['status']} (New today: {res.get('new_today', 0)})")
+
+    elif args.send_admin:
+        print("▶ Sending IPO Alert privately to Admin only...")
+        from tracker import get_classified_ipos, format_morning_alert
+        from notifiers.telegram_notifier import TelegramNotifier
+        active_ipos, upcoming_ipos = get_classified_ipos(threshold=10.0)
+        msg = format_morning_alert(active_ipos, upcoming_ipos)
+        if args.dry_run:
+            print("\n--- [DRY-RUN] ADMIN ALERT PREVIEW ---")
+            print(msg)
+            print("-------------------------------------\n")
+        else:
+            notifier = TelegramNotifier()
+            admin_id = Config.ADMIN_CHAT_ID
+            ok = notifier.send_direct(admin_id, msg)
+            if ok:
+                print(f"✅ Alert successfully sent to Admin ({admin_id}) on Telegram!")
+            else:
+                print(f"❌ Failed to send alert to Admin ({admin_id}). Check logs.")
 
     elif args.check_allotment:
         print("▶ Executing 10:00 PM Nightly IPO Allotment Check across registrars...")
