@@ -76,15 +76,21 @@ _MONTH_MAP = {
 
 def parse_date_str_to_date(d_str: str) -> Optional[datetime]:
     """
-    Parse date string like '21 Oct', '3 Sept', '19 Oct' into a datetime object.
+    Parse date string like '21 Oct', 'Oct 21', '3 Sept', '19 Oct' into a datetime object.
     Year is automatically assigned to match current year (with boundary handling).
     """
     if not d_str or d_str in ("TBA", "-", ""):
         return None
     m = re.search(r"(\d+)\s+([A-Za-z]+)", d_str)
-    if not m:
-        return None
-    day_str, month_str = m.groups()
+    if m:
+        day_str, month_str = m.groups()
+    else:
+        m2 = re.search(r"([A-Za-z]+)\s+(\d+)", d_str)
+        if m2:
+            month_str, day_str = m2.groups()
+        else:
+            return None
+
     month_key = month_str.lower()
     month_num = _MONTH_MAP.get(month_key[:4]) or _MONTH_MAP.get(month_key[:3])
     if not month_num:
@@ -195,9 +201,17 @@ def _parse_dates(date_str: str) -> tuple[str, str]:
         return (f"{start_day} {month}", f"{end_day} {month}")
 
     # Match format like 'Oct 15 - Oct 19'
-    m4 = re.match(r"^([A-Za-z]+\s+\d+)\s*(?:-|to|–)\s*([A-Za-z]+\s+\d+)$", date_str, re.IGNORECASE)
+    m4 = re.match(r"^([A-Za-z]+)\s+(\d+)\s*(?:-|to|–)\s*([A-Za-z]+)\s+(\d+)$", date_str, re.IGNORECASE)
     if m4:
-        return (m4.group(1), m4.group(2))
+        m_start, d_start, m_end, d_end = m4.groups()
+        return (f"{d_start} {m_start}", f"{d_end} {m_end}")
+
+    # Match single date like 'Oct 16'
+    m5 = re.match(r"^([A-Za-z]+)\s+(\d+)$", date_str, re.IGNORECASE)
+    if m5:
+        month, day = m5.groups()
+        normalized = f"{day} {month}"
+        return (normalized, normalized)
 
     return (date_str, date_str)
 
