@@ -81,13 +81,13 @@ jobs:
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then
             if [ "$EVENT_ACTION" = "reminder_check" ]; then
               echo "🚀 Executing 12:30 PM Reminder Check (via Webhook)..."
-              python main.py --run-reminder
+              python main.py --run-reminder --skip-if-already-dispatched
             elif [ "$EVENT_ACTION" = "allotment_check" ] || [ "$EVENT_ACTION" = "nightly_allotment_check" ]; then
               echo "🚀 Executing 10:00 PM Nightly Allotment Check (via Webhook)..."
               python main.py --check-allotment
             else
               echo "🚀 Executing 8:00 AM Morning Check (via Webhook)..."
-              python main.py --run-now
+              python main.py --run-now --skip-if-already-dispatched
             fi
 
           # PATH 2: Triggered manually from GitHub Web UI

@@ -8,7 +8,7 @@ Prioritizes GMP > 15% at the top, and displays 10% - 15% at the end.
 import sys
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Dict, Tuple, Optional
 from config import Config
 from scraper import get_all_mainboard_ipos
@@ -30,18 +30,25 @@ BROKER_APP_LINKS = {
     "Sharekhan": "https://play.google.com/store/apps/details?id=com.sharekhan.androidsharemobile"
 }
 
-DISPATCH_STATE_FILE = Config.DATA_DIR / "last_dispatch.json"
+DISPATCH_STATE_FILE = Config.DATA_DIR / "dispatch_state.json"
+LEGACY_DISPATCH_FILE = Config.DATA_DIR / "last_dispatch.json"
 
 
-def get_eligible_ipos(threshold: float = 10.0) -> List[Dict]:
+def get_classified_ipos(threshold: float = 10.0) -> Tuple[List[Dict], List[Dict]]:
     """
-    Fetch Mainboard IPOs and filter for:
-    - Status is NOT 'Closed' (Open or Upcoming)
-    - GMP % >= threshold (default 10.0% to capture both strong and moderate IPOs)
-    Sorted by GMP % descending.
+    Classify Mainboard IPOs into:
+    1. active_ipos: currently Open or Closing Today (start_date <= today <= last_filing_date)
+    2. upcoming_near_ipos: opening in the next 1-2 days (today < start_date <= today + 2 days)
+    Both exclude closed issues and require GMP % >= threshold.
     """
+    from scraper import get_all_mainboard_ipos, parse_date_str_to_date
+
     all_ipos = get_all_mainboard_ipos()
-    eligible = []
+    today = datetime.now().date()
+    near_future = today + timedelta(days=2)
+
+    active_ipos = []
+    upcoming_near_ipos = []
 
     for ipo in all_ipos:
         status = ipo.get("status", "").lower()
@@ -49,64 +56,124 @@ def get_eligible_ipos(threshold: float = 10.0) -> List[Dict]:
             continue
 
         gmp_pct = ipo.get("gmp_percent", 0.0)
-        if gmp_pct >= threshold:
-            eligible.append(ipo)
+        if gmp_pct < threshold:
+            continue
 
-    eligible.sort(key=lambda x: x.get("gmp_percent", 0.0), reverse=True)
-    return eligible
+        last_dt = parse_date_str_to_date(ipo.get("last_filing_date", ""))
+        start_dt = parse_date_str_to_date(ipo.get("start_date", ""))
+
+        last_date = last_dt.date() if last_dt else None
+        start_date = start_dt.date() if start_dt else None
+
+        # Exclude past/closed IPOs
+        if last_date and last_date < today:
+            continue
+
+        # Case 1: Closing today or currently open
+        if ipo.get("closing_today") or status == "open" or (start_date and last_date and start_date <= today <= last_date):
+            active_ipos.append(ipo)
+        # Case 2: Opening within the next 1-2 days
+        elif start_date and today < start_date <= near_future:
+            upcoming_near_ipos.append(ipo)
+        # Case 3: Start date TBA/unknown, but last date is valid and >= today
+        elif not start_date and last_date and last_date >= today:
+            if status == "open":
+                active_ipos.append(ipo)
+            elif status == "upcoming" and last_date <= near_future:
+                upcoming_near_ipos.append(ipo)
+
+    active_ipos.sort(key=lambda x: x.get("gmp_percent", 0.0), reverse=True)
+    upcoming_near_ipos.sort(key=lambda x: x.get("gmp_percent", 0.0), reverse=True)
+    return active_ipos, upcoming_near_ipos
 
 
-def format_morning_alert(ipos: List[Dict]) -> str:
+def get_eligible_ipos(threshold: float = 10.0) -> List[Dict]:
+    """
+    Fetch Mainboard IPOs that are active or upcoming within 1-2 days.
+    Provides backwards compatibility for CLI and external callers.
+    """
+    active, upcoming = get_classified_ipos(threshold=threshold)
+    return active + upcoming
+
+
+def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[Dict]] = None) -> str:
     """
     Format clean, spacious, visually appealing 8:00 AM IST Morning Alert.
-    Highlights GMP > 15% first with full details, followed by 10% - 15% at the end.
+    - If active IPOs exist: Shows Strong Conviction (GMP > 15%) first, Moderate (10%-15%) second.
+    - If NO active IPOs: Explicitly states 'No Mainboard IPOs currently active or closing today.'
+    - Under either case, displays upcoming IPOs opening in the next 1-2 days.
     """
-    today_str = datetime.now().strftime("%d %b %Y")
-    
-    strong_ipos = [ipo for ipo in ipos if ipo.get("gmp_percent", 0.0) >= 15.0]
-    moderate_ipos = [ipo for ipo in ipos if 10.0 <= ipo.get("gmp_percent", 0.0) < 15.0]
+    if upcoming_ipos is None:
+        upcoming_ipos = []
 
+    today_str = datetime.now().strftime("%d %b %Y")
     lines = [
         f"🔔 <b>MAINBOARD IPO ALERT</b> • {today_str}",
         ""
     ]
 
-    # Section 1: Strong GMP (>15%) shown first
-    if strong_ipos:
-        lines.append(f"🔥 <b>STRONG CONVICTION (GMP &gt; 15%):</b>")
-        lines.append("")
-        for idx, ipo in enumerate(strong_ipos, 1):
-            name = ipo['name']
-            price = ipo['price_band']
-            gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
-            gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            last_date = ipo['last_filing_date']
-            status = ipo['status'].upper()
+    strong_ipos = [ipo for ipo in active_ipos if ipo.get("gmp_percent", 0.0) >= 15.0]
+    moderate_ipos = [ipo for ipo in active_ipos if 10.0 <= ipo.get("gmp_percent", 0.0) < 15.0]
 
-            closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
+    # Section 1: Active IPOs (or explicit "No active IPO" message)
+    if active_ipos:
+        if strong_ipos:
+            lines.append("🔥 <b>STRONG CONVICTION (GMP &gt; 15%):</b>")
+            lines.append("")
+            for idx, ipo in enumerate(strong_ipos, 1):
+                name = ipo['name']
+                price = ipo['price_band']
+                gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
+                gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+                last_date = ipo['last_filing_date']
+                status = ipo['status'].upper()
+                closing_note = "  ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
 
-            lines.append(f"<b>{idx}. {name}</b>")
-            lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
-            lines.append(f"   • <b>Price:</b> {price}")
-            lines.append(f"   • <b>Last Filing:</b> {last_date}")
-            lines.append(f"   • <b>Status:</b> {status}")
+                lines.append(f"<b>{idx}. {name}</b>")
+                lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>) 🔥{closing_note}")
+                lines.append(f"   • <b>Price:</b> {price}")
+                lines.append(f"   • <b>Last Filing:</b> {last_date}")
+                lines.append(f"   • <b>Status:</b> {status}")
+                lines.append("")
+
+        if moderate_ipos:
+            lines.append("────────────────────────")
+            lines.append("📊 <b>MODERATE GMP (10% – 15%):</b>")
+            lines.append("")
+            for ipo in moderate_ipos:
+                name = ipo['name']
+                price = ipo['price_band']
+                gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
+                gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+                closing_note = " ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
+                lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price}{closing_note}")
             lines.append("")
     else:
-        lines.append("ℹ️ <i>No Mainboard IPOs currently exceed 15% GMP.</i>")
+        lines.append("ℹ️ <b>No Mainboard IPOs are currently active or closing today.</b>")
         lines.append("")
 
-    # Section 2: Moderate GMP (10% - 15%) shown last!
-    if moderate_ipos:
+    # Section 2: Upcoming in next 1-2 days
+    if upcoming_ipos:
         lines.append("────────────────────────")
-        lines.append("📊 <b>MODERATE GMP (10% – 15%):</b>")
+        lines.append("📅 <b>UPCOMING (Opening in Next 1–2 Days):</b>")
         lines.append("")
-        for ipo in moderate_ipos:
+        for idx, ipo in enumerate(upcoming_ipos, 1):
             name = ipo['name']
             price = ipo['price_band']
             gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
             gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
-            closing_note = " ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
-            lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price}{closing_note}")
+            start_date = ipo.get('start_date', 'TBA')
+            last_date = ipo.get('last_filing_date', 'TBA')
+            fire = " 🔥" if ipo.get("gmp_percent", 0.0) >= 15.0 else ""
+
+            lines.append(f"<b>{idx}. {name}</b>")
+            lines.append(f"   • <b>GMP:</b> {gmp_rs} (<b>{gmp_pct}</b>){fire}")
+            lines.append(f"   • <b>Price Band:</b> {price}")
+            lines.append(f"   • <b>Opens:</b> {start_date} | <b>Closes:</b> {last_date}")
+            lines.append("")
+    elif not active_ipos:
+        lines.append("────────────────────────")
+        lines.append("📅 <i>No new Mainboard IPOs scheduled to open in the next 1–2 days.</i>")
         lines.append("")
 
     lines.append("────────────────────────")
@@ -128,7 +195,8 @@ def format_morning_alert(ipos: List[Dict]) -> str:
 def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
     """
     Format clean, spacious 12:30 PM IST Reminder Alert.
-    Prioritizes IPOs closing TODAY or currently OPEN, with 10%-15% listed in secondary section.
+    Prioritizes IPOs closing TODAY or currently OPEN.
+    Returns (message_text, has_urgent_closing_today).
     """
     today_str = datetime.now().strftime("%d %b %Y")
     closing_today = [ipo for ipo in ipos if ipo.get("closing_today")]
@@ -210,29 +278,11 @@ def format_reminder_alert(ipos: List[Dict]) -> Tuple[str, bool]:
         )
         return "\n".join(lines).strip(), False
 
-    elif ipos:
-        lines.append("📋 <b>Upcoming High-GMP Mainboard IPOs:</b>")
-        lines.append("")
-        for ipo in ipos:
-            lines.append(f"<b>• {ipo['name']}</b>")
-            lines.append(f"   • <b>GMP:</b> +{ipo['gmp_percent']:.1f}%")
-            lines.append(f"   • <b>Opens:</b> {ipo['start_date']} | <b>Closes:</b> {ipo['last_filing_date']}")
-            lines.append("")
-
-        lines.append("────────────────────────")
-        lines.append("🎁 <b>Open Free Demat Account:</b>")
-        lines.append(
-            f'• <a href="{Config.ZERODHA_REFERRAL_URL}">Zerodha Kite</a>  •  '
-            f'<a href="{Config.UPSTOX_REFERRAL_URL}">Upstox</a>  •  '
-            f'<a href="{Config.GROWW_REFERRAL_URL}">Groww</a>'
-        )
-        return "\n".join(lines).strip(), False
-
     return "", False
 
 
 def _record_dispatch(dispatch_type: str):
-    """Record the date of the successful dispatch to prevent duplicate alerts."""
+    """Record the date of the successful dispatch in dispatch_state.json to prevent duplicate alerts."""
     try:
         Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
         data = {}
@@ -253,11 +303,17 @@ def _record_dispatch(dispatch_type: str):
 def has_dispatched_today(dispatch_type: str) -> bool:
     """Check if an alert of this type has already been dispatched today."""
     try:
+        today_str = datetime.now().strftime("%Y-%m-%d")
         if DISPATCH_STATE_FILE.exists():
             with open(DISPATCH_STATE_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            today_str = datetime.now().strftime("%Y-%m-%d")
-            return data.get(dispatch_type) == today_str
+            if data.get(dispatch_type) == today_str:
+                return True
+        if LEGACY_DISPATCH_FILE.exists():
+            with open(LEGACY_DISPATCH_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if data.get(dispatch_type) == today_str:
+                return True
     except Exception:
         pass
     return False
@@ -287,32 +343,23 @@ def run_morning_check(dry_run: bool = False, skip_if_already_dispatched: bool = 
     except Exception as e:
         logger.error(f"Error checking allotments in morning check: {e}")
 
-    eligible_ipos = get_eligible_ipos(threshold=10.0)
+    active_ipos, upcoming_ipos = get_classified_ipos(threshold=10.0)
+    total_qualifying = len(active_ipos) + len(upcoming_ipos)
 
-    if not eligible_ipos:
-        logger.info("No Mainboard IPOs found with GMP >= 10.0%.")
-        if not Config.SILENT_ON_EMPTY:
-            msg = "ℹ️ [8:00 AM] IPO Update: No Mainboard IPOs currently meet the 10% GMP criteria today."
-            if not dry_run:
-                dispatch_alert(msg)
-                _record_dispatch("morning")
-            return {"status": "silent_empty", "count": 0, "message": msg}
-        return {"status": "silent_empty", "count": 0, "message": None}
-
-    message = format_morning_alert(eligible_ipos)
+    message = format_morning_alert(active_ipos, upcoming_ipos)
 
     if dry_run:
         print("\n--- [DRY-RUN] MORNING ALERT PREVIEW ---")
         print(message)
         print("---------------------------------------\n")
-        return {"status": "dry_run", "count": len(eligible_ipos), "message": message}
+        return {"status": "dry_run", "count": total_qualifying, "message": message}
 
     dispatch_results = dispatch_alert(message)
     _record_dispatch("morning")
 
     return {
         "status": "dispatched",
-        "count": len(eligible_ipos),
+        "count": total_qualifying,
         "message": message,
         "results": dispatch_results
     }
@@ -342,13 +389,13 @@ def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool =
     except Exception as e:
         logger.error(f"Error checking allotments in reminder check: {e}")
 
-    eligible_ipos = get_eligible_ipos(threshold=10.0)
+    active_ipos, _ = get_classified_ipos(threshold=10.0)
 
-    if not eligible_ipos:
-        logger.info("No Mainboard IPOs with GMP >= 10.0% for reminder.")
-        return {"status": "silent_empty", "count": 0, "message": None}
+    if not active_ipos:
+        logger.info("No active Mainboard IPOs for 12:30 PM reminder.")
+        return {"status": "no_reminder_needed", "count": 0, "message": None}
 
-    message, has_urgent = format_reminder_alert(eligible_ipos)
+    message, has_urgent = format_reminder_alert(active_ipos)
     if not message:
         return {"status": "no_reminder_needed", "count": 0, "message": None}
 
@@ -356,14 +403,14 @@ def run_reminder_check(dry_run: bool = False, skip_if_already_dispatched: bool =
         print("\n--- [DRY-RUN] 12:30 PM REMINDER PREVIEW ---")
         print(message)
         print("------------------------------------------\n")
-        return {"status": "dry_run", "count": len(eligible_ipos), "message": message}
+        return {"status": "dry_run", "count": len(active_ipos), "message": message}
 
     dispatch_results = dispatch_alert(message)
     _record_dispatch("reminder")
 
     return {
         "status": "dispatched",
-        "count": len(eligible_ipos),
+        "count": len(active_ipos),
         "message": message,
         "results": dispatch_results
     }

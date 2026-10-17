@@ -67,16 +67,117 @@ def _parse_price_band(price_str: str) -> float:
         return 0.0
 
 
+# Month name to number mapping for date parsing
+_MONTH_MAP = {
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+    "jul": 7, "aug": 8, "sep": 9, "sept": 9, "oct": 10, "nov": 11, "dec": 12
+}
+
+
+def parse_date_str_to_date(d_str: str) -> Optional[datetime]:
+    """
+    Parse date string like '21 Oct', '3 Sept', '19 Oct' into a datetime object.
+    Year is automatically assigned to match current year (with boundary handling).
+    """
+    if not d_str or d_str in ("TBA", "-", ""):
+        return None
+    m = re.search(r"(\d+)\s+([A-Za-z]+)", d_str)
+    if not m:
+        return None
+    day_str, month_str = m.groups()
+    month_key = month_str.lower()
+    month_num = _MONTH_MAP.get(month_key[:4]) or _MONTH_MAP.get(month_key[:3])
+    if not month_num:
+        return None
+    now = datetime.now()
+    year = now.year
+    try:
+        dt = datetime(year, month_num, int(day_str))
+        # Handle cross-year boundary (e.g. November checking January)
+        if (dt - now).days > 200:
+            dt = dt.replace(year=year - 1)
+        elif (now - dt).days > 300:
+            dt = dt.replace(year=year + 1)
+        return dt
+    except ValueError:
+        return None
+
+
+def _clean_company_name_and_status(raw_name: str) -> tuple[str, str]:
+    """
+    Extract embedded status from IPOWatch company name and clean trailing indicators.
+    e.g. 'Jio Platforms  Upcoming' -> ('Jio Platforms', 'Upcoming')
+         'Bonfiglioli Transmissions  Open' -> ('Bonfiglioli Transmissions', 'Open')
+         'Fusion CX (C)' -> ('Fusion CX', 'Closed')
+         'HD Fire Protect (C)' -> ('HD Fire Protect', 'Closed')
+         'Paras HealthcareUpcoming' -> ('Paras Healthcare', 'Upcoming')
+    """
+    cleaned = _clean_text(raw_name)
+    extracted_status = ""
+
+    if re.search(r"\((?:C|c)\)|closed", cleaned, re.IGNORECASE):
+        extracted_status = "Closed"
+    elif re.search(r"\bopen\b|open$", cleaned, re.IGNORECASE):
+        extracted_status = "Open"
+    elif re.search(r"\bupcoming\b|upcoming$", cleaned, re.IGNORECASE):
+        extracted_status = "Upcoming"
+
+    # Strip (C), Upcoming, Open, Closed from the trailing edge of the company name
+    cleaned_name = re.sub(
+        r"(?:\s*\((?:C|c)\)|\s*Upcoming|Upcoming|\s*Open|Open|\s*Closed|Closed)\s*$",
+        "",
+        cleaned,
+        flags=re.IGNORECASE
+    ).strip()
+
+    return cleaned_name, extracted_status
+
+
+def _recompute_ipo_status_and_closing(ipo: Dict) -> Dict:
+    """
+    Recompute dynamic status and closing_today against TODAY's current date.
+    Used both on fresh scrape and when reading cached data to prevent stale flags.
+    """
+    now = datetime.now()
+    today_date = now.date()
+
+    last_filing_str = ipo.get("last_filing_date", "")
+    start_date_str = ipo.get("start_date", "")
+    last_dt = parse_date_str_to_date(last_filing_str)
+    start_dt = parse_date_str_to_date(start_date_str)
+
+    current_status = ipo.get("status", "Upcoming").capitalize()
+    closing_today = False
+
+    if last_dt is not None:
+        last_date = last_dt.date()
+        if last_date < today_date:
+            current_status = "Closed"
+        elif last_date == today_date:
+            closing_today = True
+            current_status = "Open"
+        elif start_dt is not None:
+            start_date = start_dt.date()
+            if start_date <= today_date <= last_date:
+                current_status = "Open"
+            elif today_date < start_date:
+                current_status = "Upcoming"
+    
+    ipo["closing_today"] = closing_today
+    ipo["status"] = current_status
+    return ipo
+
+
 def _parse_dates(date_str: str) -> tuple[str, str]:
     """
-    Parse date range like '1-3 Sept', '10-15 Sept', '28-1 Sept', '21-23 Sept'.
+    Parse date range like '1-3 Sept', '10-15 Sept', '28-1 Sept', '21-23 Oct'.
     Returns (start_date, last_filing_date).
     """
     date_str = _clean_text(date_str)
     if not date_str or date_str in ("-", "TBA"):
         return ("TBA", "TBA")
 
-    # Match format like '10-15 Sept' or '1-3 Sept'
+    # Match format like '10-15 Sept' or '21-23 Oct'
     m1 = re.match(r"^(\d+)\s*-\s*(\d+)\s+([A-Za-z]+)$", date_str)
     if m1:
         start_day, end_day, month = m1.groups()
@@ -93,7 +194,8 @@ def _parse_dates(date_str: str) -> tuple[str, str]:
 def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
     """
     Fetch Mainboard IPOs and GMP from IPOWatch.
-    Returns structured list of IPO dictionaries.
+    Returns structured list of IPO dictionaries with cleanly separated names,
+    verified dates, and accurate status.
     """
     url = "https://ipowatch.in/ipo-grey-market-premium-latest-ipo-gmp/"
     headers = {
@@ -136,7 +238,7 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
     # Parse headers to identify column indices
     header_row = rows[0]
     header_cells = [_clean_text(c.get_text()) for c in header_row.find_all(["th", "td"])]
-    
+
     col_map = {
         "name": 0,
         "gmp": 1,
@@ -146,20 +248,22 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
         "date": 5,
         "status": 6
     }
+    has_status_col = False
     for idx, h in enumerate(header_cells):
         h_lower = h.lower().strip()
-        if "name" in h_lower:
+        if "name" in h_lower or "company" in h_lower:
             col_map["name"] = idx
         elif "gmp" in h_lower:
             col_map["gmp"] = idx
         elif "price" in h_lower:
             col_map["price"] = idx
-        elif "listing" in h_lower:
+        elif "listing" in h_lower or "gain" in h_lower:
             col_map["est_listing"] = idx
-        elif h_lower == "date":
+        elif "date" in h_lower:
             col_map["date"] = idx
         elif "status" in h_lower:
             col_map["status"] = idx
+            has_status_col = True
 
     results = []
     for r in rows[1:]:
@@ -167,15 +271,22 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
         if len(cells) < 4:
             continue
 
-        raw_name = cells[col_map["name"]] if col_map["name"] < len(cells) else ""
-        if not raw_name or raw_name == "IPO Name":
+        raw_company_cell = cells[col_map["name"]] if col_map["name"] < len(cells) else ""
+        if not raw_company_cell or raw_company_cell.lower() in ("ipo name", "company"):
+            continue
+
+        # Clean name and extract embedded status (e.g. '(C)', 'Open', 'Upcoming')
+        clean_name, extracted_status = _clean_company_name_and_status(raw_company_cell)
+        if not clean_name:
             continue
 
         raw_gmp = cells[col_map["gmp"]] if col_map["gmp"] < len(cells) else "0"
         raw_price = cells[col_map["price"]] if col_map["price"] < len(cells) else "0"
         raw_listing = cells[col_map["est_listing"]] if col_map["est_listing"] < len(cells) else ""
         raw_date = cells[col_map["date"]] if col_map["date"] < len(cells) else ""
-        raw_status = cells[col_map["status"]] if col_map["status"] < len(cells) else "Upcoming"
+        
+        explicit_status = cells[col_map["status"]].strip().capitalize() if (has_status_col and col_map["status"] < len(cells)) else ""
+        initial_status = explicit_status or extracted_status or "Upcoming"
 
         gmp_val = _parse_currency(raw_gmp)
         price_val = _parse_price_band(raw_price)
@@ -193,25 +304,8 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
 
         start_date, last_filing_date = _parse_dates(raw_date)
 
-        # Determine if closing today (match exact day and month, e.g. '3 Sept' != '23 Sept')
-        now = datetime.now()
-        current_day = str(now.day)
-        current_month = now.strftime("%b").lower()
-        closing_today = False
-        if last_filing_date != "TBA":
-            # Extract day and month from last_filing_date
-            date_match = re.search(r"(\d+)\s+([A-Za-z]+)", last_filing_date)
-            if date_match:
-                f_day, f_month = date_match.groups()
-                if f_day == current_day and f_month.lower()[:3] == current_month[:3]:
-                    closing_today = True
-
-        status_clean = raw_status.strip().capitalize()
-        if not status_clean:
-            status_clean = "Upcoming"
-
-        results.append({
-            "name": raw_name,
+        ipo_dict = {
+            "name": clean_name,
             "type": "Mainboard",
             "price_band": raw_price,
             "price_upper": price_val,
@@ -220,10 +314,14 @@ def fetch_mainboard_ipos_ipowatch() -> List[Dict]:
             "date_range": raw_date,
             "start_date": start_date,
             "last_filing_date": last_filing_date,
-            "closing_today": closing_today,
-            "status": status_clean,
+            "closing_today": False,
+            "status": initial_status,
             "est_listing": raw_listing
-        })
+        }
+
+        # Dynamically determine real status and closing_today from dates
+        ipo_dict = _recompute_ipo_status_and_closing(ipo_dict)
+        results.append(ipo_dict)
 
     return results
 
@@ -258,28 +356,68 @@ def fetch_nse_upcoming_ipos() -> List[Dict]:
 def get_all_mainboard_ipos() -> List[Dict]:
     """
     Master function: Scrapes IPOWatch Mainboard IPOs and returns clean list.
-    Automatically caches to data/cached_mainboard_ipos.json and uses cache as fallback.
+    Automatically caches to data/cached_mainboard_ipos.json and uses cache as
+    short-term fallback (max 6 hours). Stale cache older than 6 hours is
+    discarded to prevent serving September data in October.
     """
     import json
+    from datetime import timezone, timedelta
+
+    CACHE_MAX_AGE_HOURS = 6
     cache_file = Config.DATA_DIR / "cached_mainboard_ipos.json"
 
     ipos = fetch_mainboard_ipos_ipowatch()
     if ipos:
         try:
             Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+            cache_payload = {
+                "_cached_at": datetime.now(timezone.utc).isoformat(),
+                "data": ipos
+            }
             with open(cache_file, "w", encoding="utf-8") as f:
-                json.dump(ipos, f, indent=2, ensure_ascii=False)
+                json.dump(cache_payload, f, indent=2, ensure_ascii=False)
         except Exception as e:
             logger.warning(f"Failed to save mainboard IPO cache: {e}")
         return ipos
 
+    # --- Fallback: read cache only if it is fresh enough ---
     if cache_file.exists():
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
                 cached = json.load(f)
-                if isinstance(cached, list) and cached:
-                    logger.info(f"Using cached mainboard IPO list ({len(cached)} items) as fallback.")
-                    return cached
+
+            # Support both new format {"_cached_at": ..., "data": [...]}
+            # and legacy format (plain list written by previous code)
+            if isinstance(cached, dict) and "_cached_at" in cached:
+                cached_at_str = cached["_cached_at"]
+                cached_ipos = cached.get("data", [])
+                try:
+                    cached_at = datetime.fromisoformat(cached_at_str)
+                    if cached_at.tzinfo is None:
+                        cached_at = cached_at.replace(tzinfo=timezone.utc)
+                    age_hours = (datetime.now(timezone.utc) - cached_at).total_seconds() / 3600
+                    if age_hours > CACHE_MAX_AGE_HOURS:
+                        logger.warning(
+                            f"IPO cache is {age_hours:.1f}h old (max {CACHE_MAX_AGE_HOURS}h). "
+                            "Discarding stale cache — returning empty list."
+                        )
+                        return []
+                except Exception:
+                    pass  # If timestamp is malformed, proceed to return cached data
+
+                if isinstance(cached_ipos, list) and cached_ipos:
+                    logger.info(f"Using fresh cache ({len(cached_ipos)} items, age < {CACHE_MAX_AGE_HOURS}h) as fallback.")
+                    # Recompute dynamic status and closing_today against TODAY's date
+                    return [_recompute_ipo_status_and_closing(dict(item)) for item in cached_ipos]
+
+            elif isinstance(cached, list) and cached:
+                # Legacy plain-list format: no timestamp → treat as stale, discard
+                logger.warning(
+                    "IPO cache has no timestamp (legacy format). "
+                    "Discarding to prevent serving stale data."
+                )
+                return []
+
         except Exception as e:
             logger.error(f"Error loading cached mainboard IPOs: {e}")
 

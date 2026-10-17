@@ -60,6 +60,7 @@ def start_scheduler_daemon():
     scheduler.add_job(
         run_morning_check,
         CronTrigger(hour=m_hour, minute=m_minute, timezone=ist_tz),
+        kwargs={"skip_if_already_dispatched": True},
         id="morning_check",
         name=f"Morning Check at {Config.MORNING_SCHEDULE_TIME} IST",
         misfire_grace_time=3600
@@ -69,6 +70,7 @@ def start_scheduler_daemon():
     scheduler.add_job(
         run_reminder_check,
         CronTrigger(hour=r_hour, minute=r_minute, timezone=ist_tz),
+        kwargs={"skip_if_already_dispatched": True},
         id="reminder_check",
         name=f"Reminder Check at {Config.REMINDER_SCHEDULE_TIME} IST",
         misfire_grace_time=3600
