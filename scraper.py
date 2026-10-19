@@ -378,20 +378,102 @@ def fetch_nse_upcoming_ipos() -> List[Dict]:
     return []
 
 
+def fetch_mainboard_ipos_investorgain() -> List[Dict]:
+    """
+    Secondary live scraper: Scrapes Mainboard IPOs and GMP from InvestorGain.
+    Used as an immediate live fallback when IPOWatch is blocked by Cloudflare (e.g. in cloud runners).
+    """
+    url = "https://www.investorgain.com/report/live-ipo-gmp/331/"
+    headers = {
+        "User-Agent": USER_AGENTS[0],
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Referer": "https://www.google.com/"
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=getattr(Config, "SCRAPER_TIMEOUT", 30))
+        if response.status_code != 200:
+            logger.warning(f"InvestorGain returned HTTP {response.status_code}")
+            return []
+        soup = BeautifulSoup(response.text, "html.parser")
+        table = soup.find("table")
+        if not table:
+            return []
+        rows = table.find_all("tr")
+        results = []
+        for row in rows[2:]:
+            cells = [" ".join(c.get_text().split()) for c in row.find_all(["td", "th"])]
+            if len(cells) < 9:
+                continue
+            raw_name = cells[0]
+            if "sme" in raw_name.lower():
+                continue  # Filter out SME issues
+
+            clean_name = re.sub(r"\s*(?:BSE|NSE)?\s*SME.*$", "", raw_name, flags=re.IGNORECASE)
+            clean_name = re.sub(r"\s*IPO.*$", "", clean_name, flags=re.IGNORECASE).strip()
+            clean_name = re.sub(r"\s*(?:Limited|Ltd\.?)\s*$", "", clean_name, flags=re.IGNORECASE).strip()
+            if not clean_name:
+                continue
+
+            raw_gmp = cells[1]
+            raw_price = cells[4]
+            raw_open = cells[7]
+            raw_close = cells[8]
+
+            gmp_match = re.search(r"₹\s*([\d\.]+)\s*\(([\d\.]+)%\)", raw_gmp)
+            gmp_rs = float(gmp_match.group(1)) if gmp_match else 0.0
+            gmp_pct = float(gmp_match.group(2)) if gmp_match else 0.0
+
+            p_match = re.search(r"([\d,]+)", raw_price)
+            price_val = float(p_match.group(1).replace(",", "")) if p_match else 0.0
+
+            op = re.search(r"(\d+)\s*[-/]\s*([A-Za-z]{3})", raw_open)
+            cl = re.search(r"(\d+)\s*[-/]\s*([A-Za-z]{3})", raw_close)
+            start_date = f"{op.group(1)} {op.group(2)}" if op else "TBA"
+            last_filing_date = f"{cl.group(1)} {cl.group(2)}" if cl else "TBA"
+            date_range = f"{start_date} - {last_filing_date}" if start_date != "TBA" else "TBA"
+
+            ipo_dict = {
+                "name": clean_name,
+                "type": "Mainboard",
+                "price_band": f"₹{price_val:.0f}" if price_val else "TBA",
+                "price_upper": price_val,
+                "gmp_rs": gmp_rs,
+                "gmp_percent": gmp_pct,
+                "date_range": date_range,
+                "start_date": start_date,
+                "last_filing_date": last_filing_date,
+                "closing_today": False,
+                "status": "Upcoming",
+                "est_listing": f"₹{price_val + gmp_rs:.0f} ({gmp_pct:.2f}%)" if price_val else ""
+            }
+            results.append(_recompute_ipo_status_and_closing(ipo_dict))
+
+        return results
+    except Exception as e:
+        logger.warning(f"Error fetching from InvestorGain: {e}")
+        return []
+
+
 def get_all_mainboard_ipos() -> List[Dict]:
     """
-    Master function: Scrapes IPOWatch Mainboard IPOs and returns clean list.
-    Automatically caches to data/cached_mainboard_ipos.json and uses cache as
-    short-term fallback (max 6 hours). Stale cache older than 6 hours is
-    discarded to prevent serving September data in October.
+    Master function: Scrapes live Mainboard IPOs & GMP from primary source (IPOWatch)
+    with automatic failover to secondary source (InvestorGain) and resilient disk cache.
+    Dynamically recomputes status and closing_today against TODAY's calendar date.
     """
     import json
-    from datetime import timezone, timedelta
+    from datetime import timezone
 
-    CACHE_MAX_AGE_HOURS = 6
     cache_file = Config.DATA_DIR / "cached_mainboard_ipos.json"
 
+    # 1. Primary Live Scraper: IPOWatch
     ipos = fetch_mainboard_ipos_ipowatch()
+
+    # 2. Secondary Live Scraper: InvestorGain (if IPOWatch blocked or empty)
+    if not ipos:
+        logger.info("IPOWatch returned empty or blocked. Trying secondary source: InvestorGain...")
+        ipos = fetch_mainboard_ipos_investorgain()
+
+    # 3. If any live scraper succeeded, persist to disk cache
     if ipos:
         try:
             Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -405,43 +487,16 @@ def get_all_mainboard_ipos() -> List[Dict]:
             logger.warning(f"Failed to save mainboard IPO cache: {e}")
         return ipos
 
-    # --- Fallback: read cache only if it is fresh enough ---
+    # 4. Resilient Fallback Cache: dynamically recomputes status for TODAY
     if cache_file.exists():
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
                 cached = json.load(f)
 
-            # Support both new format {"_cached_at": ..., "data": [...]}
-            # and legacy format (plain list written by previous code)
-            if isinstance(cached, dict) and "_cached_at" in cached:
-                cached_at_str = cached["_cached_at"]
-                cached_ipos = cached.get("data", [])
-                try:
-                    cached_at = datetime.fromisoformat(cached_at_str)
-                    if cached_at.tzinfo is None:
-                        cached_at = cached_at.replace(tzinfo=timezone.utc)
-                    age_hours = (datetime.now(timezone.utc) - cached_at).total_seconds() / 3600
-                    if age_hours > CACHE_MAX_AGE_HOURS:
-                        logger.warning(
-                            f"IPO cache is {age_hours:.1f}h old (max {CACHE_MAX_AGE_HOURS}h). "
-                            "Discarding stale cache — returning empty list."
-                        )
-                        return []
-                except Exception:
-                    pass  # If timestamp is malformed, proceed to return cached data
-
-                if isinstance(cached_ipos, list) and cached_ipos:
-                    logger.info(f"Using fresh cache ({len(cached_ipos)} items, age < {CACHE_MAX_AGE_HOURS}h) as fallback.")
-                    # Recompute dynamic status and closing_today against TODAY's date
-                    return [_recompute_ipo_status_and_closing(dict(item)) for item in cached_ipos]
-
-            elif isinstance(cached, list) and cached:
-                # Legacy plain-list format: no timestamp → treat as stale, discard
-                logger.warning(
-                    "IPO cache has no timestamp (legacy format). "
-                    "Discarding to prevent serving stale data."
-                )
-                return []
+            cached_ipos = cached.get("data", []) if isinstance(cached, dict) else (cached if isinstance(cached, list) else [])
+            if cached_ipos:
+                logger.info(f"Using cached IPO data ({len(cached_ipos)} items) as fallback with dynamic date recomputation.")
+                return [_recompute_ipo_status_and_closing(dict(item)) for item in cached_ipos]
 
         except Exception as e:
             logger.error(f"Error loading cached mainboard IPOs: {e}")

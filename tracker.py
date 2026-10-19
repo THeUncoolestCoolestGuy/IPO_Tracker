@@ -56,7 +56,8 @@ def get_classified_ipos(threshold: float = 10.0) -> Tuple[List[Dict], List[Dict]
             continue
 
         gmp_pct = ipo.get("gmp_percent", 0.0)
-        if gmp_pct < threshold:
+        # Keep if GMP >= threshold OR if closing today (so users never miss a closing deadline)
+        if gmp_pct < threshold and not ipo.get("closing_today"):
             continue
 
         last_dt = parse_date_str_to_date(ipo.get("last_filing_date", ""))
@@ -174,6 +175,20 @@ def format_morning_alert(active_ipos: List[Dict], upcoming_ipos: Optional[List[D
                 closing_note = " ⚠️ <b>(CLOSES TODAY!)</b>" if ipo.get("closing_today") else ""
                 ipo_dates = format_ipo_dates(ipo)
                 lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price} | Date: {ipo_dates}{closing_note}")
+            lines.append("")
+
+        closing_other = [ipo for ipo in active_ipos if ipo.get("closing_today") and ipo.get("gmp_percent", 0.0) < 10.0]
+        if closing_other:
+            lines.append("────────────────────────")
+            lines.append("⚠️ <b>ALSO CLOSING TODAY (Subdued GMP &lt; 10%):</b>")
+            lines.append("")
+            for ipo in closing_other:
+                name = ipo['name']
+                price = ipo['price_band']
+                gmp_rs = f"₹{ipo['gmp_rs']:.0f}" if ipo['gmp_rs'].is_integer() else f"₹{ipo['gmp_rs']:.1f}"
+                gmp_pct = f"+{ipo['gmp_percent']:.1f}%"
+                ipo_dates = format_ipo_dates(ipo)
+                lines.append(f"• <b>{name}</b>: GMP <b>{gmp_pct}</b> ({gmp_rs}) | Price: {price} | Date: {ipo_dates} ⚠️ (CLOSES TODAY!)")
             lines.append("")
     else:
         lines.append("ℹ️ <b>No Mainboard IPOs are currently active or closing today.</b>")

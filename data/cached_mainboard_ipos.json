@@ -1,19 +1,33 @@
 {
-  "_cached_at": "2026-10-17T09:05:22.092864+00:00",
+  "_cached_at": "2026-10-19T06:46:28.278363+00:00",
   "data": [
+    {
+      "name": "BLS Polymers",
+      "type": "Mainboard",
+      "price_band": "₹150",
+      "price_upper": 150.0,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
+      "date_range": "27-29 Oct",
+      "start_date": "27 Oct",
+      "last_filing_date": "29 Oct",
+      "closing_today": false,
+      "status": "Upcoming",
+      "est_listing": "₹155 (00.00%)"
+    },
     {
       "name": "Jio Platforms",
       "type": "Mainboard",
       "price_band": "₹1,119",
       "price_upper": 1119.0,
-      "gmp_rs": 225.0,
-      "gmp_percent": 20.11,
+      "gmp_rs": 250.0,
+      "gmp_percent": 22.34,
       "date_range": "21-23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹1344 (20.11%)"
+      "est_listing": "₹1369 (22.34%)"
     },
     {
       "name": "Paras Healthcare",
@@ -39,7 +53,7 @@
       "date_range": "15-19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
       "est_listing": "₹716 (22.18%)"
     },
@@ -48,42 +62,42 @@
       "type": "Mainboard",
       "price_band": "₹700",
       "price_upper": 700.0,
-      "gmp_rs": 516.0,
-      "gmp_percent": 73.71,
+      "gmp_rs": 520.0,
+      "gmp_percent": 74.28,
       "date_range": "15-19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
-      "est_listing": "₹1216 (73.71%)"
+      "est_listing": "₹1220 (74.28%)"
     },
     {
       "name": "Zetwerk",
       "type": "Mainboard",
       "price_band": "₹151",
       "price_upper": 151.0,
-      "gmp_rs": 7.0,
-      "gmp_percent": 4.64,
+      "gmp_rs": 5.0,
+      "gmp_percent": 3.31,
       "date_range": "15-19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
-      "est_listing": "₹158 (4.64%)"
+      "est_listing": "₹156 (3.31%)"
     },
     {
       "name": "Sahajanand Medical",
       "type": "Mainboard",
       "price_band": "₹344",
       "price_upper": 344.0,
-      "gmp_rs": 35.0,
-      "gmp_percent": 10.17,
+      "gmp_rs": 25.0,
+      "gmp_percent": 7.27,
       "date_range": "15-19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
-      "est_listing": "₹379 (10.17%)"
+      "est_listing": "₹369 (7.27%)"
     },
     {
       "name": "Fusion CX",
@@ -104,14 +118,14 @@
       "type": "Mainboard",
       "price_band": "₹271",
       "price_upper": 271.0,
-      "gmp_rs": 80.0,
-      "gmp_percent": 29.52,
+      "gmp_rs": 70.0,
+      "gmp_percent": 25.83,
       "date_range": "13-15 Oct",
       "start_date": "13 Oct",
       "last_filing_date": "15 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹351 (29.52%)"
+      "est_listing": "₹341 (25.83%)"
     }
   ]
 }
