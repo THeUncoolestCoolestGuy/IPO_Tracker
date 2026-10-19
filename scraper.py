@@ -5,6 +5,7 @@ Secondary / Cross-check: NSE India Upcoming IPOs API
 """
 
 import sys
+import os
 import re
 import logging
 from typing import List, Dict, Optional
@@ -454,11 +455,133 @@ def fetch_mainboard_ipos_investorgain() -> List[Dict]:
         return []
 
 
+def fetch_mainboard_ipos_ipoguru() -> List[Dict]:
+    """
+    Scrapes Mainboard IPOs & GMP from IPOGuru (https://www.ipoguru.in/live-ipo-gmp).
+    Also supports official IPOGuru REST API (https://www.ipoguru.in/api/v2/gmp?status=open)
+    if IPOGURU_API_KEY is configured in Config or environment.
+    Unblocked on datacenter/cloud runner IPs.
+    """
+    api_key = getattr(Config, "IPOGURU_API_KEY", "") or os.environ.get("IPOGURU_API_KEY", "")
+    if api_key:
+        try:
+            api_url = "https://www.ipoguru.in/api/v2/gmp?status=open"
+            headers = {"X-API-KEY": api_key, "Accept": "application/json"}
+            res = requests.get(api_url, headers=headers, timeout=getattr(Config, "SCRAPER_TIMEOUT", 15))
+            if res.status_code == 200:
+                data = res.json()
+                if data.get("success") and data.get("data"):
+                    results = []
+                    for item in data["data"]:
+                        if item.get("type", "").lower() != "mainboard":
+                            continue
+                        gmp_info = item.get("gmp", {})
+                        gmp_p = re.sub(r"[^\d.]", "", str(gmp_info.get("price", "0")))
+                        gmp_rs = float(gmp_p) if gmp_p else 0.0
+                        pct_s = re.sub(r"[^\d.]", "", str(gmp_info.get("percentage", "0")))
+                        gmp_pct = float(pct_s) if pct_s else 0.0
+                        est_p = float(gmp_info.get("estimated_listing_price", 0.0) or 0.0)
+                        price_val = float(est_p - gmp_rs) if est_p and est_p > gmp_rs else 0.0
+
+                        ipo_dict = {
+                            "name": item.get("name", ""),
+                            "type": "Mainboard",
+                            "price_band": f"₹{price_val:.0f}" if price_val else "TBA",
+                            "price_upper": price_val,
+                            "gmp_rs": gmp_rs,
+                            "gmp_percent": gmp_pct,
+                            "date_range": "TBA",
+                            "start_date": "TBA",
+                            "last_filing_date": "TBA",
+                            "closing_today": False,
+                            "status": item.get("status", "Upcoming"),
+                            "est_listing": f"₹{est_p:.0f} ({gmp_pct:.2f}%)" if est_p else ""
+                        }
+                        results.append(_recompute_ipo_status_and_closing(ipo_dict))
+                    if results:
+                        logger.info(f"Successfully retrieved {len(results)} Mainboard IPOs from IPOGuru Developer API.")
+                        return results
+        except Exception as e:
+            logger.warning(f"IPOGuru Developer API failed, falling back to HTML scraper: {e}")
+
+    # Fallback to HTML scraper on live-ipo-gmp
+    url = "https://www.ipoguru.in/live-ipo-gmp"
+    headers = {
+        "User-Agent": USER_AGENTS[0],
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Referer": "https://www.google.com/"
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=getattr(Config, "SCRAPER_TIMEOUT", 20))
+        if response.status_code != 200:
+            logger.warning(f"IPOGuru returned HTTP {response.status_code}")
+            return []
+        soup = BeautifulSoup(response.text, "html.parser")
+        table = soup.find("table")
+        if not table:
+            return []
+        rows = table.find_all("tr")
+        results = []
+        for row in rows[1:]:
+            cells = [" ".join(c.get_text().split()) for c in row.find_all(["td", "th"])]
+            if len(cells) < 4:
+                continue
+            company_cell = cells[0]
+            if "sme" in company_cell.lower():
+                continue
+
+            date_match = re.search(r"(\d+\s+[A-Za-z]{3})\s*-\s*(\d+\s+[A-Za-z]{3})", company_cell)
+            start_date = date_match.group(1) if date_match else "TBA"
+            last_filing_date = date_match.group(2) if date_match else "TBA"
+
+            clean_name = re.sub(r"\s*Mainboard.*$", "", company_cell, flags=re.IGNORECASE)
+            clean_name = re.sub(r"\s*IPO.*$", "", clean_name, flags=re.IGNORECASE).strip()
+            clean_name = re.sub(r"\s*(?:Limited|Ltd\.?)\s*$", "", clean_name, flags=re.IGNORECASE).strip()
+            if not clean_name:
+                continue
+
+            raw_price = cells[1]
+            raw_gmp = cells[2]
+            raw_pct = cells[3]
+
+            p_num = re.sub(r"[^\d.]", "", raw_price)
+            g_num = re.sub(r"[^\d.]", "", raw_gmp)
+            pct_num = re.sub(r"[^\d.]", "", raw_pct)
+
+            price_val = float(p_num) if p_num else 0.0
+            gmp_rs = float(g_num) if g_num else 0.0
+            gmp_pct = float(pct_num) if pct_num else 0.0
+            date_range = f"{start_date} - {last_filing_date}" if start_date != "TBA" else "TBA"
+
+            ipo_dict = {
+                "name": clean_name,
+                "type": "Mainboard",
+                "price_band": f"₹{price_val:.0f}" if price_val else "TBA",
+                "price_upper": price_val,
+                "gmp_rs": gmp_rs,
+                "gmp_percent": gmp_pct,
+                "date_range": date_range,
+                "start_date": start_date,
+                "last_filing_date": last_filing_date,
+                "closing_today": False,
+                "status": "Upcoming",
+                "est_listing": f"₹{price_val + gmp_rs:.0f} ({gmp_pct:.2f}%)" if price_val else ""
+            }
+            results.append(_recompute_ipo_status_and_closing(ipo_dict))
+
+        return results
+    except Exception as e:
+        logger.warning(f"Error fetching from IPOGuru: {e}")
+        return []
+
+
 def get_all_mainboard_ipos() -> List[Dict]:
     """
-    Master function: Scrapes live Mainboard IPOs & GMP from primary source (IPOWatch)
-    with automatic failover to secondary source (InvestorGain) and resilient disk cache.
-    Dynamically recomputes status and closing_today against TODAY's calendar date.
+    Master function: Scrapes live Mainboard IPOs & GMP with a multi-tier resilient fallback:
+      1. Primary: IPOWatch (Community benchmark)
+      2. Secondary: IPOGuru (Fast, unblocked on datacenter IPs, official Developer API support)
+      3. Tertiary: InvestorGain (High-frequency live GMP table)
+      4. Fallback: Resilient local cache with dynamic calendar-date status recomputation
     """
     import json
     from datetime import timezone
@@ -468,12 +591,17 @@ def get_all_mainboard_ipos() -> List[Dict]:
     # 1. Primary Live Scraper: IPOWatch
     ipos = fetch_mainboard_ipos_ipowatch()
 
-    # 2. Secondary Live Scraper: InvestorGain (if IPOWatch blocked or empty)
+    # 2. Secondary Live Source: IPOGuru (Live table / Developer API)
     if not ipos:
-        logger.info("IPOWatch returned empty or blocked. Trying secondary source: InvestorGain...")
+        logger.info("IPOWatch returned empty or blocked. Trying secondary source: IPOGuru...")
+        ipos = fetch_mainboard_ipos_ipoguru()
+
+    # 3. Tertiary Live Source: InvestorGain (if IPOWatch & IPOGuru both fail)
+    if not ipos:
+        logger.info("IPOGuru returned empty. Trying tertiary source: InvestorGain...")
         ipos = fetch_mainboard_ipos_investorgain()
 
-    # 3. If any live scraper succeeded, persist to disk cache
+    # 4. If any live scraper succeeded, persist to disk cache
     if ipos:
         try:
             Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -487,7 +615,7 @@ def get_all_mainboard_ipos() -> List[Dict]:
             logger.warning(f"Failed to save mainboard IPO cache: {e}")
         return ipos
 
-    # 4. Resilient Fallback Cache: dynamically recomputes status for TODAY
+    # 5. Resilient Fallback Cache: dynamically recomputes status for TODAY
     if cache_file.exists():
         try:
             with open(cache_file, "r", encoding="utf-8") as f:

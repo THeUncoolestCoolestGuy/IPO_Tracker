@@ -64,6 +64,10 @@ class Config:
     GROWW_REFERRAL_URL = os.getenv("GROWW_REFERRAL_URL", "https://app.groww.in/v3cO/r30uflbm").strip()
     GROWW_REFERRAL_CODE = os.getenv("GROWW_REFERRAL_CODE", "4ABMY9").strip()
 
+    # External Scraper & Developer API Keys
+    IPOGURU_API_KEY = os.getenv("IPOGURU_API_KEY", "").strip()
+    APIFY_TOKEN = os.getenv("APIFY_TOKEN", "").strip()
+
 # Ensure required directories exist
 Config.DATA_DIR.mkdir(parents=True, exist_ok=True)
 Config.LOGS_DIR.mkdir(parents=True, exist_ok=True)

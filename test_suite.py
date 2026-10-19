@@ -398,14 +398,89 @@ def run_all_tests() -> TestResultTracker:
         )
         tracker.record(g8, "InvestorGain Mainboard Parsing & SME Exclusion", ig_pass)
 
-    # 2. Scraper Failover (IPOWatch -> InvestorGain)
-    mock_secondary_data = [{"name": "Failover IPO", "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "gmp_percent": 20.0, "price_band": "₹500"}]
+    # 2. IPOGuru HTML Scraping & SME Exclusion
+    mock_guru_html = """
+    <table>
+      <tr><th>Company</th><th>Issue Price</th><th>IPO GMP</th><th>GMP %</th></tr>
+      <tr>
+        <td>Tonbo Imaging India Mainboard 15 Oct - 19 Oct</td>
+        <td>Rs 700</td>
+        <td>Rs 520</td>
+        <td>74.29%</td>
+      </tr>
+      <tr>
+        <td>Shellz India SME 15 Oct - 19 Oct</td>
+        <td>Rs 179</td>
+        <td>Rs 41</td>
+        <td>22.91%</td>
+      </tr>
+    </table>
+    """
+    mock_guru_resp = MagicMock()
+    mock_guru_resp.status_code = 200
+    mock_guru_resp.text = mock_guru_html
+    with patch("requests.get", return_value=mock_guru_resp), \
+         patch("scraper.Config.IPOGURU_API_KEY", ""):
+        from scraper import fetch_mainboard_ipos_ipoguru
+        guru_results = fetch_mainboard_ipos_ipoguru()
+        guru_pass = (
+            len(guru_results) == 1
+            and guru_results[0]["name"] == "Tonbo Imaging India"
+            and guru_results[0]["gmp_rs"] == 520.0
+            and guru_results[0]["gmp_percent"] == 74.29
+            and guru_results[0]["start_date"] == "15 Oct"
+            and guru_results[0]["last_filing_date"] == "19 Oct"
+        )
+        tracker.record(g8, "IPOGuru Live HTML Parsing & SME Exclusion", guru_pass)
+
+    # 3. IPOGuru Developer REST API Parsing
+    mock_api_payload = {
+        "success": True,
+        "data": [
+            {
+                "name": "API Test IPO",
+                "type": "Mainboard",
+                "status": "Open",
+                "gmp": {"price": "50", "percentage": "25%", "estimated_listing_price": 250}
+            },
+            {
+                "name": "API SME IPO",
+                "type": "SME",
+                "status": "Open",
+                "gmp": {"price": "10", "percentage": "10%", "estimated_listing_price": 110}
+            }
+        ]
+    }
+    mock_api_resp = MagicMock()
+    mock_api_resp.status_code = 200
+    mock_api_resp.json.return_value = mock_api_payload
+    with patch("requests.get", return_value=mock_api_resp), \
+         patch("scraper.Config.IPOGURU_API_KEY", "mock_key"):
+        api_results = fetch_mainboard_ipos_ipoguru()
+        api_pass = (
+            len(api_results) == 1
+            and api_results[0]["name"] == "API Test IPO"
+            and api_results[0]["gmp_rs"] == 50.0
+            and api_results[0]["gmp_percent"] == 25.0
+        )
+        tracker.record(g8, "IPOGuru Developer API Parsing & Validation", api_pass)
+
+    # 4. Multi-tier Failover (IPOWatch -> IPOGuru -> InvestorGain)
+    mock_guru_failover = [{"name": "Guru Failover", "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "gmp_percent": 18.0, "price_band": "₹300"}]
     with patch("scraper.fetch_mainboard_ipos_ipowatch", return_value=[]), \
-         patch("scraper.fetch_mainboard_ipos_investorgain", return_value=mock_secondary_data), \
+         patch("scraper.fetch_mainboard_ipos_ipoguru", return_value=mock_guru_failover), \
          patch("builtins.open", create=True):
         from scraper import get_all_mainboard_ipos
-        failover_res = get_all_mainboard_ipos()
-        tracker.record(g8, "Failover from IPOWatch to InvestorGain", len(failover_res) == 1 and failover_res[0]["name"] == "Failover IPO")
+        res_tier2 = get_all_mainboard_ipos()
+        tracker.record(g8, "Tier-2 Failover to IPOGuru", len(res_tier2) == 1 and res_tier2[0]["name"] == "Guru Failover")
+
+    mock_secondary_data = [{"name": "InvestorGain Failover", "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "gmp_percent": 20.0, "price_band": "₹500"}]
+    with patch("scraper.fetch_mainboard_ipos_ipowatch", return_value=[]), \
+         patch("scraper.fetch_mainboard_ipos_ipoguru", return_value=[]), \
+         patch("scraper.fetch_mainboard_ipos_investorgain", return_value=mock_secondary_data), \
+         patch("builtins.open", create=True):
+        res_tier3 = get_all_mainboard_ipos()
+        tracker.record(g8, "Tier-3 Failover to InvestorGain", len(res_tier3) == 1 and res_tier3[0]["name"] == "InvestorGain Failover")
 
     # 3. Resilient Cache Retention (>6h old cache not discarded)
     old_iso = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
@@ -416,6 +491,7 @@ def run_all_tests() -> TestResultTracker:
         ]
     }
     with patch("scraper.fetch_mainboard_ipos_ipowatch", return_value=[]), \
+         patch("scraper.fetch_mainboard_ipos_ipoguru", return_value=[]), \
          patch("scraper.fetch_mainboard_ipos_investorgain", return_value=[]), \
          patch("pathlib.Path.exists", return_value=True), \
          patch("builtins.open", mock_open(read_data=json.dumps(mock_cache_data))):
