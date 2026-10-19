@@ -18,8 +18,10 @@ import os
 import re
 import time
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Tuple, Any
+import unittest.mock
+from unittest.mock import patch, MagicMock, mock_open
 
 # Ensure UTF-8 console encoding
 if hasattr(sys.stdout, "reconfigure"):
@@ -345,6 +347,106 @@ def run_all_tests() -> TestResultTracker:
                 json.dump(d_data, f, indent=2)
     except Exception:
         pass
+
+    # ---------------------------------------------------------
+    # SUITE 8: Scraper Failover, Resilient Cache & Low-GMP Gating
+    # ---------------------------------------------------------
+    g8 = "8. Scraper Failover & Low-GMP Gating"
+
+    # 1. InvestorGain Parsing & SME Exclusion
+    mock_ig_html = """
+    <table>
+      <tr><th>H1</th></tr>
+      <tr><th>H2</th></tr>
+      <tr>
+        <td>Tonbo Imaging India Ltd</td>
+        <td>₹520 (74.29%)</td>
+        <td>₹665 - ₹700</td>
+        <td>₹700</td>
+        <td>₹700</td>
+        <td>₹1,220</td>
+        <td>74.29%</td>
+        <td>15-Oct</td>
+        <td>19-Oct</td>
+      </tr>
+      <tr>
+        <td>Shellz India Ltd SME IPO</td>
+        <td>₹30 (16.76%)</td>
+        <td>₹170 - ₹179</td>
+        <td>₹179</td>
+        <td>₹179</td>
+        <td>₹209</td>
+        <td>16.76%</td>
+        <td>15-Oct</td>
+        <td>19-Oct</td>
+      </tr>
+    </table>
+    """
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.text = mock_ig_html
+    with patch("requests.get", return_value=mock_resp):
+        from scraper import fetch_mainboard_ipos_investorgain
+        ig_results = fetch_mainboard_ipos_investorgain()
+        ig_pass = (
+            len(ig_results) == 1
+            and ig_results[0]["name"] == "Tonbo Imaging India"
+            and ig_results[0]["gmp_rs"] == 520.0
+            and ig_results[0]["gmp_percent"] == 74.29
+            and ig_results[0]["start_date"] == "15 Oct"
+            and ig_results[0]["last_filing_date"] == "19 Oct"
+        )
+        tracker.record(g8, "InvestorGain Mainboard Parsing & SME Exclusion", ig_pass)
+
+    # 2. Scraper Failover (IPOWatch -> InvestorGain)
+    mock_secondary_data = [{"name": "Failover IPO", "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "gmp_percent": 20.0, "price_band": "₹500"}]
+    with patch("scraper.fetch_mainboard_ipos_ipowatch", return_value=[]), \
+         patch("scraper.fetch_mainboard_ipos_investorgain", return_value=mock_secondary_data), \
+         patch("builtins.open", create=True):
+        from scraper import get_all_mainboard_ipos
+        failover_res = get_all_mainboard_ipos()
+        tracker.record(g8, "Failover from IPOWatch to InvestorGain", len(failover_res) == 1 and failover_res[0]["name"] == "Failover IPO")
+
+    # 3. Resilient Cache Retention (>6h old cache not discarded)
+    old_iso = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
+    mock_cache_data = {
+        "_cached_at": old_iso,
+        "data": [
+            {"name": "Bonfiglioli Transmissions", "start_date": "15 Oct", "last_filing_date": today_str, "status": "Upcoming", "gmp_percent": 22.2, "price_band": "₹586"}
+        ]
+    }
+    with patch("scraper.fetch_mainboard_ipos_ipowatch", return_value=[]), \
+         patch("scraper.fetch_mainboard_ipos_investorgain", return_value=[]), \
+         patch("pathlib.Path.exists", return_value=True), \
+         patch("builtins.open", mock_open(read_data=json.dumps(mock_cache_data))):
+        cached_res = get_all_mainboard_ipos()
+        cache_survives = len(cached_res) == 1 and cached_res[0]["name"] == "Bonfiglioli Transmissions"
+        date_recomputed = cached_res[0].get("closing_today") is True and cached_res[0].get("status") == "Open"
+        tracker.record(g8, "Resilient Cache Retained (>6h old)", cache_survives)
+        tracker.record(g8, "Cache Dynamic Date Recomputation", date_recomputed)
+
+    # 4. Low-GMP Closing-Today Retention (Zetwerk 3.3%)
+    mock_classified_input = [
+        {"name": "Tonbo Imaging", "gmp_percent": 74.3, "start_date": "15 Oct", "last_filing_date": today_str, "closing_today": True, "status": "Open"},
+        {"name": "Zetwerk", "gmp_percent": 3.3, "start_date": "15 Oct", "last_filing_date": today_str, "closing_today": True, "status": "Open"},
+        {"name": "Subdued Non-Closing", "gmp_percent": 4.0, "start_date": "15 Oct", "last_filing_date": future_str, "closing_today": False, "status": "Open"},
+    ]
+    with patch("scraper.get_all_mainboard_ipos", return_value=mock_classified_input):
+        c_active, c_upcoming = get_classified_ipos(threshold=10.0)
+        c_names = [x["name"] for x in c_active]
+        tracker.record(g8, "Low-GMP Closing-Today Retained (<10%)", "Zetwerk" in c_names and "Tonbo Imaging" in c_names)
+        tracker.record(g8, "Low-GMP Non-Closing Excluded", "Subdued Non-Closing" not in c_names and "Subdued Non-Closing" not in [x["name"] for x in c_upcoming])
+
+    # 5. Subdued GMP Alert Section Formatting & Tag Balance
+    mock_morning_input = [
+        {"name": "Tonbo Imaging", "price_band": "₹700", "gmp_rs": 520.0, "gmp_percent": 74.3, "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "closing_today": True},
+        {"name": "Zetwerk", "price_band": "₹151", "gmp_rs": 5.0, "gmp_percent": 3.3, "start_date": "15 Oct", "last_filing_date": "19 Oct", "status": "Open", "closing_today": True},
+    ]
+    morning_formatted = format_morning_alert(mock_morning_input, [])
+    has_subdued_hdr = "ALSO CLOSING TODAY (Subdued GMP &lt; 10%)" in morning_formatted
+    has_both = "Tonbo Imaging" in morning_formatted and "Zetwerk" in morning_formatted
+    tags_valid = validate_html_tags(morning_formatted)
+    tracker.record(g8, "Subdued GMP Alert Section & HTML Balance", has_subdued_hdr and has_both and tags_valid)
 
     return tracker
 
