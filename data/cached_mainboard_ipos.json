@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-20T07:00:54.897271+00:00",
+  "_cached_at": "2026-10-20T07:45:40.905991+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
@@ -30,6 +30,20 @@
       "est_listing": "₹334 (23.25%)"
     },
     {
+      "name": "Jio Platforms",
+      "type": "Mainboard",
+      "price_band": "₹1119",
+      "price_upper": 1119.0,
+      "gmp_rs": 247.0,
+      "gmp_percent": 22.07,
+      "date_range": "21 Oct - 23 Oct",
+      "start_date": "21 Oct",
+      "last_filing_date": "23 Oct",
+      "closing_today": false,
+      "status": "Upcoming",
+      "est_listing": "₹1366 (22.07%)"
+    },
+    {
       "name": "Bonfiglioli Transmissions",
       "type": "Mainboard",
       "price_band": "₹586",
@@ -42,20 +56,6 @@
       "closing_today": false,
       "status": "Closed",
       "est_listing": "₹714 (21.84%)"
-    },
-    {
-      "name": "Jio Platforms",
-      "type": "Mainboard",
-      "price_band": "₹1119",
-      "price_upper": 1119.0,
-      "gmp_rs": 243.0,
-      "gmp_percent": 21.72,
-      "date_range": "21 Oct - 23 Oct",
-      "start_date": "21 Oct",
-      "last_filing_date": "23 Oct",
-      "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹1362 (21.72%)"
     },
     {
       "name": "BLS Polymers",
@@ -76,42 +76,42 @@
       "type": "Mainboard",
       "price_band": "₹693",
       "price_upper": 693.0,
-      "gmp_rs": 81.0,
-      "gmp_percent": 11.69,
+      "gmp_rs": 75.0,
+      "gmp_percent": 10.82,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹774 (11.69%)"
+      "est_listing": "₹768 (10.82%)"
     },
     {
       "name": "Sahajanand Medical Technologies",
       "type": "Mainboard",
       "price_band": "₹344",
       "price_upper": 344.0,
-      "gmp_rs": 24.0,
-      "gmp_percent": 6.98,
+      "gmp_rs": 25.0,
+      "gmp_percent": 7.27,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹368 (6.98%)"
+      "est_listing": "₹369 (7.27%)"
     },
     {
       "name": "Fusion CX",
       "type": "Mainboard",
       "price_band": "₹289",
       "price_upper": 289.0,
-      "gmp_rs": 19.0,
-      "gmp_percent": 6.57,
+      "gmp_rs": 19.5,
+      "gmp_percent": 6.75,
       "date_range": "14 Oct - 16 Oct",
       "start_date": "14 Oct",
       "last_filing_date": "16 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹308 (6.57%)"
+      "est_listing": "₹308 (6.75%)"
     },
     {
       "name": "Zetwerk Manufacturing Business",
