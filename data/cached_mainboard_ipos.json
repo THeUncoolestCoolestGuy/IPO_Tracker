@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-20T02:30:46.333861+00:00",
+  "_cached_at": "2026-10-20T07:00:54.897271+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
@@ -20,70 +20,70 @@
       "type": "Mainboard",
       "price_band": "₹271",
       "price_upper": 271.0,
-      "gmp_rs": 61.0,
-      "gmp_percent": 22.51,
+      "gmp_rs": 63.0,
+      "gmp_percent": 23.25,
       "date_range": "13 Oct - 15 Oct",
       "start_date": "13 Oct",
       "last_filing_date": "15 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹332 (22.51%)"
-    },
-    {
-      "name": "Jio Platforms",
-      "type": "Mainboard",
-      "price_band": "₹1119",
-      "price_upper": 1119.0,
-      "gmp_rs": 245.0,
-      "gmp_percent": 21.89,
-      "date_range": "21 Oct - 23 Oct",
-      "start_date": "21 Oct",
-      "last_filing_date": "23 Oct",
-      "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹1364 (21.89%)"
+      "est_listing": "₹334 (23.25%)"
     },
     {
       "name": "Bonfiglioli Transmissions",
       "type": "Mainboard",
       "price_band": "₹586",
       "price_upper": 586.0,
-      "gmp_rs": 127.0,
-      "gmp_percent": 21.67,
+      "gmp_rs": 128.0,
+      "gmp_percent": 21.84,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹713 (21.67%)"
+      "est_listing": "₹714 (21.84%)"
+    },
+    {
+      "name": "Jio Platforms",
+      "type": "Mainboard",
+      "price_band": "₹1119",
+      "price_upper": 1119.0,
+      "gmp_rs": 243.0,
+      "gmp_percent": 21.72,
+      "date_range": "21 Oct - 23 Oct",
+      "start_date": "21 Oct",
+      "last_filing_date": "23 Oct",
+      "closing_today": false,
+      "status": "Upcoming",
+      "est_listing": "₹1362 (21.72%)"
     },
     {
       "name": "BLS Polymers",
       "type": "Mainboard",
       "price_band": "₹150",
       "price_upper": 150.0,
-      "gmp_rs": 18.0,
-      "gmp_percent": 12.0,
+      "gmp_rs": 27.0,
+      "gmp_percent": 18.0,
       "date_range": "27 Oct - 29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹168 (12.00%)"
+      "est_listing": "₹177 (18.00%)"
     },
     {
       "name": "Paras Healthcare",
       "type": "Mainboard",
       "price_band": "₹693",
       "price_upper": 693.0,
-      "gmp_rs": 78.0,
-      "gmp_percent": 11.26,
+      "gmp_rs": 81.0,
+      "gmp_percent": 11.69,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹771 (11.26%)"
+      "est_listing": "₹774 (11.69%)"
     },
     {
       "name": "Sahajanand Medical Technologies",
@@ -104,14 +104,14 @@
       "type": "Mainboard",
       "price_band": "₹289",
       "price_upper": 289.0,
-      "gmp_rs": 15.0,
-      "gmp_percent": 5.19,
+      "gmp_rs": 19.0,
+      "gmp_percent": 6.57,
       "date_range": "14 Oct - 16 Oct",
       "start_date": "14 Oct",
       "last_filing_date": "16 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹304 (5.19%)"
+      "est_listing": "₹308 (6.57%)"
     },
     {
       "name": "Zetwerk Manufacturing Business",
