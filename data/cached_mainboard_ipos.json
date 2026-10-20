@@ -1,131 +1,131 @@
 {
-  "_cached_at": "2026-10-20T07:45:40.905991+00:00",
+  "_cached_at": "2026-10-20T16:30:51.160412+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
       "type": "Mainboard",
       "price_band": "₹700",
       "price_upper": 700.0,
-      "gmp_rs": 510.0,
-      "gmp_percent": 72.86,
+      "gmp_rs": 515.0,
+      "gmp_percent": 73.57,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1210 (72.86%)"
+      "est_listing": "₹1215 (73.57%)"
     },
     {
       "name": "HD Fire Protect",
       "type": "Mainboard",
       "price_band": "₹271",
       "price_upper": 271.0,
-      "gmp_rs": 63.0,
-      "gmp_percent": 23.25,
+      "gmp_rs": 71.0,
+      "gmp_percent": 26.2,
       "date_range": "13 Oct - 15 Oct",
       "start_date": "13 Oct",
       "last_filing_date": "15 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹334 (23.25%)"
+      "est_listing": "₹342 (26.20%)"
     },
     {
       "name": "Jio Platforms",
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 247.0,
-      "gmp_percent": 22.07,
+      "gmp_rs": 268.0,
+      "gmp_percent": 23.95,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹1366 (22.07%)"
+      "est_listing": "₹1387 (23.95%)"
     },
     {
       "name": "Bonfiglioli Transmissions",
       "type": "Mainboard",
       "price_band": "₹586",
       "price_upper": 586.0,
-      "gmp_rs": 128.0,
-      "gmp_percent": 21.84,
+      "gmp_rs": 137.0,
+      "gmp_percent": 23.38,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹714 (21.84%)"
+      "est_listing": "₹723 (23.38%)"
     },
     {
       "name": "BLS Polymers",
       "type": "Mainboard",
       "price_band": "₹150",
       "price_upper": 150.0,
-      "gmp_rs": 27.0,
-      "gmp_percent": 18.0,
+      "gmp_rs": 30.0,
+      "gmp_percent": 20.0,
       "date_range": "27 Oct - 29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹177 (18.00%)"
+      "est_listing": "₹180 (20.00%)"
     },
     {
       "name": "Paras Healthcare",
       "type": "Mainboard",
       "price_band": "₹693",
       "price_upper": 693.0,
-      "gmp_rs": 75.0,
-      "gmp_percent": 10.82,
+      "gmp_rs": 50.0,
+      "gmp_percent": 7.22,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹768 (10.82%)"
+      "est_listing": "₹743 (7.22%)"
     },
     {
       "name": "Sahajanand Medical Technologies",
       "type": "Mainboard",
       "price_band": "₹344",
       "price_upper": 344.0,
-      "gmp_rs": 25.0,
-      "gmp_percent": 7.27,
+      "gmp_rs": 24.0,
+      "gmp_percent": 6.98,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹369 (7.27%)"
+      "est_listing": "₹368 (6.98%)"
     },
     {
       "name": "Fusion CX",
       "type": "Mainboard",
       "price_band": "₹289",
       "price_upper": 289.0,
-      "gmp_rs": 19.5,
-      "gmp_percent": 6.75,
+      "gmp_rs": 20.0,
+      "gmp_percent": 6.92,
       "date_range": "14 Oct - 16 Oct",
       "start_date": "14 Oct",
       "last_filing_date": "16 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹308 (6.75%)"
+      "est_listing": "₹309 (6.92%)"
     },
     {
       "name": "Zetwerk Manufacturing Business",
       "type": "Mainboard",
       "price_band": "₹151",
       "price_upper": 151.0,
-      "gmp_rs": 3.5,
-      "gmp_percent": 2.32,
+      "gmp_rs": 2.0,
+      "gmp_percent": 1.32,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹154 (2.32%)"
+      "est_listing": "₹153 (1.32%)"
     }
   ]
 }
