@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-20T16:30:51.160412+00:00",
+  "_cached_at": "2026-10-21T02:30:43.729422+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
@@ -34,14 +34,14 @@
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 268.0,
-      "gmp_percent": 23.95,
+      "gmp_rs": 273.0,
+      "gmp_percent": 24.4,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹1387 (23.95%)"
+      "status": "Open",
+      "est_listing": "₹1392 (24.40%)"
     },
     {
       "name": "Bonfiglioli Transmissions",
@@ -82,7 +82,7 @@
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
-      "status": "Upcoming",
+      "status": "Open",
       "est_listing": "₹743 (7.22%)"
     },
     {
