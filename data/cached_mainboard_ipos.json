@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-21T16:30:52.992909+00:00",
+  "_cached_at": "2026-10-22T02:31:02.350934+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
@@ -16,32 +16,32 @@
       "est_listing": "₹1212 (73.14%)"
     },
     {
-      "name": "Bonfiglioli Transmissions",
-      "type": "Mainboard",
-      "price_band": "₹586",
-      "price_upper": 586.0,
-      "gmp_rs": 132.0,
-      "gmp_percent": 22.53,
-      "date_range": "15 Oct - 19 Oct",
-      "start_date": "15 Oct",
-      "last_filing_date": "19 Oct",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "₹718 (22.53%)"
-    },
-    {
       "name": "Jio Platforms",
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 249.0,
-      "gmp_percent": 22.25,
+      "gmp_rs": 246.0,
+      "gmp_percent": 21.98,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Open",
-      "est_listing": "₹1368 (22.25%)"
+      "est_listing": "₹1365 (21.98%)"
+    },
+    {
+      "name": "Bonfiglioli Transmissions",
+      "type": "Mainboard",
+      "price_band": "₹586",
+      "price_upper": 586.0,
+      "gmp_rs": 121.0,
+      "gmp_percent": 20.65,
+      "date_range": "15 Oct - 19 Oct",
+      "start_date": "15 Oct",
+      "last_filing_date": "19 Oct",
+      "closing_today": false,
+      "status": "Closed",
+      "est_listing": "₹707 (20.65%)"
     },
     {
       "name": "BLS Polymers",
@@ -76,42 +76,42 @@
       "type": "Mainboard",
       "price_band": "₹344",
       "price_upper": 344.0,
-      "gmp_rs": 24.0,
-      "gmp_percent": 6.98,
+      "gmp_rs": 19.0,
+      "gmp_percent": 5.52,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹368 (6.98%)"
+      "est_listing": "₹363 (5.52%)"
     },
     {
       "name": "Fusion CX",
       "type": "Mainboard",
       "price_band": "₹289",
       "price_upper": 289.0,
-      "gmp_rs": 15.0,
-      "gmp_percent": 5.19,
+      "gmp_rs": 13.5,
+      "gmp_percent": 4.67,
       "date_range": "14 Oct - 16 Oct",
       "start_date": "14 Oct",
       "last_filing_date": "16 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹304 (5.19%)"
+      "est_listing": "₹302 (4.67%)"
     },
     {
       "name": "Paras Healthcare",
       "type": "Mainboard",
       "price_band": "₹693",
       "price_upper": 693.0,
-      "gmp_rs": 28.0,
-      "gmp_percent": 4.04,
+      "gmp_rs": 25.0,
+      "gmp_percent": 3.61,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Open",
-      "est_listing": "₹721 (4.04%)"
+      "est_listing": "₹718 (3.61%)"
     },
     {
       "name": "EAAA India Alternatives",
