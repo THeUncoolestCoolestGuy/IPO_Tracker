@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-23T07:00:57.378113+00:00",
+  "_cached_at": "2026-10-23T16:30:49.703226+00:00",
   "data": [
     {
       "name": "BLS Polymers",
@@ -20,14 +20,28 @@
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 245.0,
-      "gmp_percent": 21.89,
+      "gmp_rs": 248.0,
+      "gmp_percent": 22.16,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹1364 (21.89%)"
+      "est_listing": "₹1367 (22.16%)"
+    },
+    {
+      "name": "Bombay Coated and Special Steels",
+      "type": "Mainboard",
+      "price_band": "₹82",
+      "price_upper": 82.0,
+      "gmp_rs": 8.0,
+      "gmp_percent": 9.76,
+      "date_range": "29 Oct - 2 Nov",
+      "start_date": "29 Oct",
+      "last_filing_date": "2 Nov",
+      "closing_today": false,
+      "status": "Upcoming",
+      "est_listing": "₹90 (9.76%)"
     },
     {
       "name": "SFC Environmental Technologies",
@@ -48,28 +62,14 @@
       "type": "Mainboard",
       "price_band": "₹693",
       "price_upper": 693.0,
-      "gmp_rs": 8.0,
-      "gmp_percent": 1.15,
+      "gmp_rs": 11.0,
+      "gmp_percent": 1.59,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹701 (1.15%)"
-    },
-    {
-      "name": "Bombay Coated and Special Steels",
-      "type": "Mainboard",
-      "price_band": "₹82",
-      "price_upper": 82.0,
-      "gmp_rs": 0.0,
-      "gmp_percent": 0.0,
-      "date_range": "29 Oct - 2 Nov",
-      "start_date": "29 Oct",
-      "last_filing_date": "2 Nov",
-      "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹82 (0.00%)"
+      "est_listing": "₹704 (1.59%)"
     },
     {
       "name": "M.K.Sons Fine Jewels",
