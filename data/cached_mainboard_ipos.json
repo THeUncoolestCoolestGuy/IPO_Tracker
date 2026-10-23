@@ -1,19 +1,19 @@
 {
-  "_cached_at": "2026-10-22T16:30:53.748677+00:00",
+  "_cached_at": "2026-10-23T02:30:50.814082+00:00",
   "data": [
     {
       "name": "Tonbo Imaging India",
       "type": "Mainboard",
       "price_band": "₹700",
       "price_upper": 700.0,
-      "gmp_rs": 445.0,
-      "gmp_percent": 63.57,
+      "gmp_rs": 450.0,
+      "gmp_percent": 64.29,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1145 (63.57%)"
+      "est_listing": "₹1150 (64.29%)"
     },
     {
       "name": "BLS Polymers",
@@ -34,28 +34,28 @@
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 239.0,
-      "gmp_percent": 21.36,
+      "gmp_rs": 240.0,
+      "gmp_percent": 21.45,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
-      "est_listing": "₹1358 (21.36%)"
+      "est_listing": "₹1359 (21.45%)"
     },
     {
       "name": "Bonfiglioli Transmissions",
       "type": "Mainboard",
       "price_band": "₹586",
       "price_upper": 586.0,
-      "gmp_rs": 62.0,
-      "gmp_percent": 10.58,
+      "gmp_rs": 66.0,
+      "gmp_percent": 11.26,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹648 (10.58%)"
+      "est_listing": "₹652 (11.26%)"
     },
     {
       "name": "SFC Environmental Technologies",
@@ -76,14 +76,14 @@
       "type": "Mainboard",
       "price_band": "₹344",
       "price_upper": 344.0,
-      "gmp_rs": 16.0,
-      "gmp_percent": 4.65,
+      "gmp_rs": 17.0,
+      "gmp_percent": 4.94,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹360 (4.65%)"
+      "est_listing": "₹361 (4.94%)"
     },
     {
       "name": "Paras Healthcare",
@@ -95,7 +95,7 @@
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
       "est_listing": "₹706 (1.88%)"
     },
@@ -104,14 +104,14 @@
       "type": "Mainboard",
       "price_band": "₹151",
       "price_upper": 151.0,
-      "gmp_rs": 1.5,
-      "gmp_percent": 0.99,
+      "gmp_rs": 1.0,
+      "gmp_percent": 0.66,
       "date_range": "15 Oct - 19 Oct",
       "start_date": "15 Oct",
       "last_filing_date": "19 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹152 (0.99%)"
+      "est_listing": "₹152 (0.66%)"
     },
     {
       "name": "EAAA India Alternatives",
