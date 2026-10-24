@@ -1,19 +1,19 @@
 {
-  "_cached_at": "2026-10-24T07:00:56.786597+00:00",
+  "_cached_at": "2026-10-24T07:26:03.285476+00:00",
   "data": [
     {
       "name": "Jio Platforms",
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 250.0,
-      "gmp_percent": 22.34,
+      "gmp_rs": 252.0,
+      "gmp_percent": 22.52,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1369 (22.34%)"
+      "est_listing": "₹1371 (22.52%)"
     },
     {
       "name": "BLS Polymers",
