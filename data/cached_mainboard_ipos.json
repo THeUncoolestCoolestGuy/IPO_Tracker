@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-23T16:30:49.703226+00:00",
+  "_cached_at": "2026-10-24T02:30:50.005075+00:00",
   "data": [
     {
       "name": "BLS Polymers",
@@ -20,14 +20,14 @@
       "type": "Mainboard",
       "price_band": "₹1119",
       "price_upper": 1119.0,
-      "gmp_rs": 248.0,
-      "gmp_percent": 22.16,
+      "gmp_rs": 250.0,
+      "gmp_percent": 22.34,
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
-      "closing_today": true,
-      "status": "Open",
-      "est_listing": "₹1367 (22.16%)"
+      "closing_today": false,
+      "status": "Closed",
+      "est_listing": "₹1369 (22.34%)"
     },
     {
       "name": "Bombay Coated and Special Steels",
@@ -42,6 +42,20 @@
       "closing_today": false,
       "status": "Upcoming",
       "est_listing": "₹90 (9.76%)"
+    },
+    {
+      "name": "EAAA India Alternatives",
+      "type": "Mainboard",
+      "price_band": "₹1665",
+      "price_upper": 1665.0,
+      "gmp_rs": 121.0,
+      "gmp_percent": 7.27,
+      "date_range": "26 Oct - 28 Oct",
+      "start_date": "26 Oct",
+      "last_filing_date": "28 Oct",
+      "closing_today": false,
+      "status": "Upcoming",
+      "est_listing": "₹1786 (7.27%)"
     },
     {
       "name": "SFC Environmental Technologies",
@@ -67,8 +81,8 @@
       "date_range": "21 Oct - 23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹704 (1.59%)"
     },
     {
@@ -84,20 +98,6 @@
       "closing_today": false,
       "status": "Upcoming",
       "est_listing": "₹162 (0.00%)"
-    },
-    {
-      "name": "EAAA India Alternatives",
-      "type": "Mainboard",
-      "price_band": "₹1665",
-      "price_upper": 1665.0,
-      "gmp_rs": 0.0,
-      "gmp_percent": 0.0,
-      "date_range": "26 Oct - 28 Oct",
-      "start_date": "26 Oct",
-      "last_filing_date": "28 Oct",
-      "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹1665 (0.00%)"
     }
   ]
 }
