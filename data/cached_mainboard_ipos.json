@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-25T16:30:48.671169+00:00",
+  "_cached_at": "2026-10-26T02:30:46.394130+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -34,42 +34,42 @@
       "type": "Mainboard",
       "price_band": "₹330",
       "price_upper": 330.0,
-      "gmp_rs": 30.0,
-      "gmp_percent": 9.09,
+      "gmp_rs": 32.0,
+      "gmp_percent": 9.7,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹360 (9.09%)"
+      "est_listing": "₹362 (9.70%)"
     },
     {
       "name": "BLS Polymers",
       "type": "Mainboard",
       "price_band": "₹150",
       "price_upper": 150.0,
-      "gmp_rs": 35.0,
-      "gmp_percent": 23.33,
+      "gmp_rs": 38.0,
+      "gmp_percent": 25.33,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹185 (23.33%)"
+      "est_listing": "₹188 (25.33%)"
     },
     {
       "name": "EAAA India Alternatives",
       "type": "Mainboard",
       "price_band": "₹1,665",
       "price_upper": 1665.0,
-      "gmp_rs": 80.0,
-      "gmp_percent": 4.8,
+      "gmp_rs": 50.0,
+      "gmp_percent": 3.0,
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
       "closing_today": false,
-      "status": "Upcoming",
-      "est_listing": "₹1745 (4.80%)"
+      "status": "Open",
+      "est_listing": "₹1715 (3.00%)"
     },
     {
       "name": "Jio Platforms",
