@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-27T16:30:54.605657+00:00",
+  "_cached_at": "2026-10-28T02:30:46.924113+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -26,7 +26,7 @@
       "start_date": "28 Oct",
       "last_filing_date": "30 Oct",
       "closing_today": false,
-      "status": "Upcoming",
+      "status": "Open",
       "est_listing": "₹170 (4.94%)"
     },
     {
@@ -67,7 +67,7 @@
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
       "est_listing": "₹1685 (1.20%)"
     },
@@ -76,14 +76,14 @@
       "type": "Mainboard",
       "price_band": "₹1,119",
       "price_upper": 1119.0,
-      "gmp_rs": 260.0,
-      "gmp_percent": 23.23,
+      "gmp_rs": 245.0,
+      "gmp_percent": 21.89,
       "date_range": "21-23 Oct",
       "start_date": "21 Oct",
       "last_filing_date": "23 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1379 (23.23%)"
+      "est_listing": "₹1364 (21.89%)"
     },
     {
       "name": "Paras Healthcare",
