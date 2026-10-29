@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-28T16:30:52.035308+00:00",
+  "_cached_at": "2026-10-29T02:30:51.506838+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -39,7 +39,7 @@
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
       "est_listing": "₹348 (5.45%)"
     },
@@ -53,7 +53,7 @@
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
-      "closing_today": false,
+      "closing_today": true,
       "status": "Open",
       "est_listing": "₹194 (29.33%)"
     },
@@ -67,8 +67,8 @@
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹1677 (0.72%)"
     },
     {
