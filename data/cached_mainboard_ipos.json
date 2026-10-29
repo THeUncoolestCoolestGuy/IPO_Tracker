@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-29T02:30:51.506838+00:00",
+  "_cached_at": "2026-10-29T07:00:54.265761+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -20,84 +20,56 @@
       "type": "Mainboard",
       "price_band": "₹162",
       "price_upper": 162.0,
-      "gmp_rs": 10.0,
-      "gmp_percent": 6.17,
+      "gmp_rs": 15.0,
+      "gmp_percent": 9.26,
       "date_range": "28-30 Oct",
       "start_date": "28 Oct",
       "last_filing_date": "30 Oct",
       "closing_today": false,
       "status": "Open",
-      "est_listing": "₹172 (6.17%)"
+      "est_listing": "₹177 (9.26%)"
     },
     {
       "name": "SFC Environmental Technologies",
       "type": "Mainboard",
       "price_band": "₹330",
       "price_upper": 330.0,
-      "gmp_rs": 18.0,
-      "gmp_percent": 5.45,
+      "gmp_rs": 12.0,
+      "gmp_percent": 3.64,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹348 (5.45%)"
+      "est_listing": "₹342 (3.64%)"
     },
     {
       "name": "BLS Polymers",
       "type": "Mainboard",
       "price_band": "₹150",
       "price_upper": 150.0,
-      "gmp_rs": 44.0,
-      "gmp_percent": 29.33,
+      "gmp_rs": 51.0,
+      "gmp_percent": 34.0,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹194 (29.33%)"
+      "est_listing": "₹201 (34.00%)"
     },
     {
       "name": "EAAA India Alternatives",
       "type": "Mainboard",
       "price_band": "₹1,665",
       "price_upper": 1665.0,
-      "gmp_rs": 12.0,
-      "gmp_percent": 0.72,
+      "gmp_rs": 30.0,
+      "gmp_percent": 1.8,
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1677 (0.72%)"
-    },
-    {
-      "name": "Jio Platforms",
-      "type": "Mainboard",
-      "price_band": "₹1,119",
-      "price_upper": 1119.0,
-      "gmp_rs": 247.0,
-      "gmp_percent": 22.07,
-      "date_range": "21-23 Oct",
-      "start_date": "21 Oct",
-      "last_filing_date": "23 Oct",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "₹1366 (22.07%)"
-    },
-    {
-      "name": "Paras Healthcare",
-      "type": "Mainboard",
-      "price_band": "₹693",
-      "price_upper": 693.0,
-      "gmp_rs": 13.0,
-      "gmp_percent": 1.88,
-      "date_range": "21-23 Oct",
-      "start_date": "21 Oct",
-      "last_filing_date": "23 Oct",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "₹706 (1.88%)"
+      "est_listing": "₹1695 (1.80%)"
     }
   ]
 }
