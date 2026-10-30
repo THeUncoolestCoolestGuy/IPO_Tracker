@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-30T02:30:58.492841+00:00",
+  "_cached_at": "2026-10-30T07:00:54.348618+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -20,56 +20,56 @@
       "type": "Mainboard",
       "price_band": "₹162",
       "price_upper": 162.0,
-      "gmp_rs": 15.0,
-      "gmp_percent": 9.26,
+      "gmp_rs": 12.0,
+      "gmp_percent": 7.41,
       "date_range": "28-30 Oct",
       "start_date": "28 Oct",
       "last_filing_date": "30 Oct",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹177 (9.26%)"
+      "est_listing": "₹174 (7.41%)"
     },
     {
       "name": "SFC Environmental Technologies",
       "type": "Mainboard",
       "price_band": "₹330",
       "price_upper": 330.0,
-      "gmp_rs": 12.0,
-      "gmp_percent": 3.64,
+      "gmp_rs": 20.0,
+      "gmp_percent": 6.06,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹342 (3.64%)"
+      "est_listing": "₹350 (6.06%)"
     },
     {
       "name": "BLS Polymers",
       "type": "Mainboard",
       "price_band": "₹150",
       "price_upper": 150.0,
-      "gmp_rs": 51.0,
-      "gmp_percent": 34.0,
+      "gmp_rs": 68.0,
+      "gmp_percent": 45.33,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹201 (34.00%)"
+      "est_listing": "₹218 (45.33%)"
     },
     {
       "name": "EAAA India Alternatives",
       "type": "Mainboard",
       "price_band": "₹1,665",
       "price_upper": 1665.0,
-      "gmp_rs": 30.0,
-      "gmp_percent": 1.8,
+      "gmp_rs": 40.0,
+      "gmp_percent": 2.4,
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1695 (1.80%)"
+      "est_listing": "₹1705 (2.40%)"
     }
   ]
 }
