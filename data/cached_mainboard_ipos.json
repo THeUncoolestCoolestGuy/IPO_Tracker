@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-10-30T16:30:44.787303+00:00",
+  "_cached_at": "2026-10-31T02:30:46.539179+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -25,8 +25,8 @@
       "date_range": "28-30 Oct",
       "start_date": "28 Oct",
       "last_filing_date": "30 Oct",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹174 (7.41%)"
     },
     {
