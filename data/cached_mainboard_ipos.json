@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-01T16:30:47.490692+00:00",
+  "_cached_at": "2026-11-02T02:30:49.272996+00:00",
   "data": [
     {
       "name": "Bombay Coated and Special Steels",
@@ -11,8 +11,8 @@
       "date_range": "29-2 Nov",
       "start_date": "29 Nov",
       "last_filing_date": "2 Nov",
-      "closing_today": false,
-      "status": "Upcoming",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹91 (10.98%)"
     },
     {
@@ -34,14 +34,14 @@
       "type": "Mainboard",
       "price_band": "₹330",
       "price_upper": 330.0,
-      "gmp_rs": 25.0,
-      "gmp_percent": 7.58,
+      "gmp_rs": 26.0,
+      "gmp_percent": 7.88,
       "date_range": "27-29 Oct",
       "start_date": "27 Oct",
       "last_filing_date": "29 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹355 (7.58%)"
+      "est_listing": "₹356 (7.88%)"
     },
     {
       "name": "BLS Polymers",
@@ -62,14 +62,14 @@
       "type": "Mainboard",
       "price_band": "₹1,665",
       "price_upper": 1665.0,
-      "gmp_rs": 65.0,
-      "gmp_percent": 3.9,
+      "gmp_rs": 54.0,
+      "gmp_percent": 3.24,
       "date_range": "26-28 Oct",
       "start_date": "26 Oct",
       "last_filing_date": "28 Oct",
       "closing_today": false,
       "status": "Closed",
-      "est_listing": "₹1730 (3.90%)"
+      "est_listing": "₹1719 (3.24%)"
     }
   ]
 }
