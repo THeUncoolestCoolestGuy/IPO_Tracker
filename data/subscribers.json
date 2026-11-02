@@ -3,13 +3,13 @@
     "name": "The uncoolest coolest guy",
     "role": "admin",
     "pans": [
-      "enc:gAAAAABqqO0rrH0FV3gGmJ45vy83Z4u5yuq5f0Jl3a7DMxkH-uSLN3-7QcKGLni3wPXaqp5nBX1uvpCWORfQZPLi3DfRl7eHbw==",
-      "enc:gAAAAABqqO0rkhERaVND0hIpplg-lZNm69O5YIG79HM6ZIfJhs639HeO8xdp6Lys9Mj_43QWN8MBAt7rGQTPAgdG_KE3PYK0Gw==",
-      "enc:gAAAAABqqO0r8ohEAXSKZV1bjD-inl1kq-9MjTrG-Ejserqo5-2t0VIEyppKVt4QIkBQckYHzNSupG0_M3gEWtzR-ySMv5-41w==",
-      "enc:gAAAAABqqO0rqqYVykuF_QcK_2g8NlOk-vPI8FybP_OffF6pFr4vlr3Lufwtd0tya8d57kPiCnlwsD_FywCYfIQVGth-hwvz-g==",
-      "enc:gAAAAABqqO0rGXwveWXGStMQWFR1G-WLzd3JzrncSshXnT8x6ATlukLTT1m__cB6MnZfxW_zJueuRrmfF9qAkLOIx29xz6HkuQ==",
-      "enc:gAAAAABqqO0ruxG0KPfPG7dXR39g93bTz8LUrAlb2OYV3ah5EKtTcYMoNf0Y4aNPSCOdKac3OQxEJGlHEzuS7Wm_8qTsRN6fTw==",
-      "enc:gAAAAABqqO0rzUbyPar_vSXdg94JIl-q0aVHQPKvXN4lJA2buIJ4XrM2Rbo5HIqzUYU18svxgVkYtHBt04bc0g7-Rv-9UoiNAQ=="
+      "enc:gAAAAABq6DUiR6wVXS3yuntImGrrK2k5L0OIjxHNtDQhqnF2yO9SQSD6E_4A8WmVe0JqLpc9rfA0zttYhK5ZaTzUw0gXJjHvlQ==",
+      "enc:gAAAAABq6DUiJ3fC8IjgjyWwC_kNcluGIwr4HDQCKbkqnIxnQ1Tzcjh7Bd3HWWrS81Q3uDOyVh5d79W-loCVPan0816HQ47Qgw==",
+      "enc:gAAAAABq6DUichALe6oyD41n60Cad_qbYvHuzJ2nnnIf3q0D2ZB67SkG4OQV-7rB_0Lq1csHTwe_fm0tGNp1-7MoYRZ1x7s7lQ==",
+      "enc:gAAAAABq6DUiNaaqFj9nZRVioIj2HiflYfdeitnlK3rhgZMFGMABgFaKCj1xp_e7Q3M6HOg5xjGCKAkGETC6HcDpEo6UioJuJg==",
+      "enc:gAAAAABq6DUiqL4AvxtztomToQCEHm7a-2vDhofKXOqXk5Qk7WNz0KjO0hMImUxtC0yKPtAzFz65agDDrDUf_QONKs7TmdrOrw==",
+      "enc:gAAAAABq6DUiOwSyYGxBiBvPQodMCnL8-YN-Wrbp0bchAhCNsv4nJNSPh3OOkHqa7rMw84DscLWuMRpny6Ew3AJehOGj7O75fA==",
+      "enc:gAAAAABq6DUix0YP6i_qGppk_dANYfaIobFyFRpWvaYVC-Pn0uzvKzOedw73JDsHADzuZdvhcwBy_0AMzIp8ATowuiq1owr44Q=="
     ],
     "joined_at": "2026-09-08T10:00:00+05:30"
   },
@@ -17,7 +17,7 @@
     "name": "Dr. Chirag Paunwala (@cpaunwala)",
     "role": "member",
     "pans": [
-      "enc:gAAAAABqqO0rke7hVBEz6RQ2jH-Ydanu7l5L7mtwqghBkk8B3kJYHD88YEb_wBSlUzmrnEBP6OEOv7_81qVMLxsNdWAGw0z3kg=="
+      "enc:gAAAAABq6DUiaOxx6aVFFaYDN3-joPEb2xt0XuGcIroJcAJ6q2rksj-863FQU0hsVXe9e9_i4bakGYDXXGi3NKHqlna4sOoN9g=="
     ],
     "joined_at": "2026-09-08T10:00:00+05:30"
   },
@@ -63,5 +63,11 @@
     "role": "member",
     "pans": [],
     "joined_at": "2026-09-12T14:30:00+05:30"
+  },
+  "7158463037": {
+    "name": "Saikumar Kondaparthi",
+    "role": "member",
+    "pans": [],
+    "joined_at": "2026-11-02T12:30:48.550497+05:30"
   }
 }
