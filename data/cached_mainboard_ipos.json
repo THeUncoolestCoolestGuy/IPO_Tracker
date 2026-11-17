@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-16T16:41:16.598745+00:00",
+  "_cached_at": "2026-11-17T02:30:52.734827+00:00",
   "data": [
     {
       "name": "Crystal Crop Protection",
@@ -20,14 +20,14 @@
       "type": "Mainboard",
       "price_band": "₹136",
       "price_upper": 136.0,
-      "gmp_rs": 3.65,
-      "gmp_percent": 2.68,
+      "gmp_rs": 3.5,
+      "gmp_percent": 2.57,
       "date_range": "19 Nov - 23 Nov",
       "start_date": "19 Nov",
       "last_filing_date": "23 Nov",
       "closing_today": false,
       "status": "Upcoming",
-      "est_listing": "₹140 (2.68%)"
+      "est_listing": "₹140 (2.57%)"
     }
   ]
 }
