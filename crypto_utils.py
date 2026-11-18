@@ -41,9 +41,10 @@ def encrypt_pan(pan: str) -> str:
     """Encrypt a plain text PAN card to an 'enc:...' ciphertext."""
     if not pan:
         return ""
-    pan_str = str(pan).strip().upper()
+    pan_str = str(pan).strip()
     if pan_str.startswith("enc:"):
         return pan_str
+    pan_str = pan_str.upper()
 
     try:
         f = _get_fernet()
@@ -59,7 +60,7 @@ def decrypt_pan(val: str) -> str:
     if not val:
         return ""
     val_str = str(val).strip()
-    if not val_str.startswith("enc:"):
+    if not val_str.lower().startswith("enc:"):
         # Backwards compatible with unencrypted legacy PANs
         return val_str.upper()
 
