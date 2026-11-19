@@ -1,19 +1,33 @@
 {
-  "_cached_at": "2026-11-19T02:30:48.682456+00:00",
+  "_cached_at": "2026-11-19T07:00:54.858468+00:00",
   "data": [
+    {
+      "name": "Shree Siddhivinayak Greentech Industries",
+      "type": "Mainboard",
+      "price_band": "₹130 - ₹142",
+      "price_upper": 142.0,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
+      "date_range": "19 Nov 2026",
+      "start_date": "19 Nov 2026",
+      "last_filing_date": "19 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "₹142"
+    },
     {
       "name": "Crystal Crop Protection",
       "type": "Mainboard",
       "price_band": "₹259 - ₹272",
       "price_upper": 272.0,
-      "gmp_rs": 19.0,
-      "gmp_percent": 6.99,
-      "date_range": "18 Nov 2026",
-      "start_date": "18 Nov 2026",
-      "last_filing_date": "18 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "₹291 (+6.99%)"
+      "gmp_rs": 18.0,
+      "gmp_percent": 6.62,
+      "date_range": "19 Nov 2026",
+      "start_date": "19 Nov 2026",
+      "last_filing_date": "19 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "₹290 (+6.62%)"
     },
     {
       "name": "Mahanadi Coalfields",
@@ -22,11 +36,11 @@
       "price_upper": 136.0,
       "gmp_rs": 3.0,
       "gmp_percent": 2.21,
-      "date_range": "18 Nov 2026",
-      "start_date": "18 Nov 2026",
-      "last_filing_date": "18 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "19 Nov 2026",
+      "start_date": "19 Nov 2026",
+      "last_filing_date": "19 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹139 (+2.21%)"
     },
     {
@@ -34,14 +48,14 @@
       "type": "Mainboard",
       "price_band": "₹232 - ₹245",
       "price_upper": 245.0,
-      "gmp_rs": 37.0,
-      "gmp_percent": 15.1,
-      "date_range": "18 Nov 2026",
-      "start_date": "18 Nov 2026",
-      "last_filing_date": "18 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "₹282 (+15.1%)"
+      "gmp_rs": 62.0,
+      "gmp_percent": 25.31,
+      "date_range": "19 Nov 2026",
+      "start_date": "19 Nov 2026",
+      "last_filing_date": "19 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "₹307 (+25.31%)"
     }
   ]
 }
