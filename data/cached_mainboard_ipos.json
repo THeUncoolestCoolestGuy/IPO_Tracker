@@ -1,6 +1,20 @@
 {
-  "_cached_at": "2026-11-18T16:30:58.895352+00:00",
+  "_cached_at": "2026-11-19T02:30:48.682456+00:00",
   "data": [
+    {
+      "name": "Crystal Crop Protection",
+      "type": "Mainboard",
+      "price_band": "₹259 - ₹272",
+      "price_upper": 272.0,
+      "gmp_rs": 19.0,
+      "gmp_percent": 6.99,
+      "date_range": "18 Nov 2026",
+      "start_date": "18 Nov 2026",
+      "last_filing_date": "18 Nov 2026",
+      "closing_today": false,
+      "status": "Closed",
+      "est_listing": "₹291 (+6.99%)"
+    },
     {
       "name": "Mahanadi Coalfields",
       "type": "Mainboard",
@@ -11,8 +25,8 @@
       "date_range": "18 Nov 2026",
       "start_date": "18 Nov 2026",
       "last_filing_date": "18 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹139 (+2.21%)"
     },
     {
@@ -25,23 +39,9 @@
       "date_range": "18 Nov 2026",
       "start_date": "18 Nov 2026",
       "last_filing_date": "18 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹282 (+15.1%)"
-    },
-    {
-      "name": "Crystal Crop Protection",
-      "type": "Mainboard",
-      "price_band": "₹259 - ₹272",
-      "price_upper": 272.0,
-      "gmp_rs": 19.0,
-      "gmp_percent": 6.99,
-      "date_range": "18 Nov 2026",
-      "start_date": "18 Nov 2026",
-      "last_filing_date": "18 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
-      "est_listing": "₹291 (+6.99%)"
     }
   ]
 }
