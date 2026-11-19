@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-19T07:00:54.858468+00:00",
+  "_cached_at": "2026-11-19T16:30:53.648527+00:00",
   "data": [
     {
       "name": "Shree Siddhivinayak Greentech Industries",
@@ -20,42 +20,42 @@
       "type": "Mainboard",
       "price_band": "₹259 - ₹272",
       "price_upper": 272.0,
-      "gmp_rs": 18.0,
-      "gmp_percent": 6.62,
+      "gmp_rs": 17.0,
+      "gmp_percent": 6.25,
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹290 (+6.62%)"
+      "est_listing": "₹289 (+6.25%)"
     },
     {
       "name": "Mahanadi Coalfields",
       "type": "Mainboard",
       "price_band": "₹129 - ₹136",
       "price_upper": 136.0,
-      "gmp_rs": 3.0,
-      "gmp_percent": 2.21,
+      "gmp_rs": 2.0,
+      "gmp_percent": 1.47,
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹139 (+2.21%)"
+      "est_listing": "₹138 (+1.47%)"
     },
     {
       "name": "Watrana Rentals",
       "type": "Mainboard",
       "price_band": "₹232 - ₹245",
       "price_upper": 245.0,
-      "gmp_rs": 62.0,
-      "gmp_percent": 25.31,
+      "gmp_rs": 67.0,
+      "gmp_percent": 27.35,
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹307 (+25.31%)"
+      "est_listing": "₹312 (+27.35%)"
     }
   ]
 }
