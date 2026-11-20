@@ -1,33 +1,47 @@
 {
-  "_cached_at": "2026-11-20T07:00:53.496990+00:00",
+  "_cached_at": "2026-11-20T16:30:59.337118+00:00",
   "data": [
     {
-      "name": "Crystal Crop Protection",
+      "name": "Monomark Engineering",
       "type": "Mainboard",
-      "price_band": "₹259 - ₹272",
-      "price_upper": 272.0,
-      "gmp_rs": 17.0,
-      "gmp_percent": 6.25,
+      "price_band": "₹0",
+      "price_upper": 0.0,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
       "date_range": "20 Nov 2026",
       "start_date": "20 Nov 2026",
       "last_filing_date": "20 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹289 (+6.25%)"
+      "est_listing": "—"
+    },
+    {
+      "name": "Crystal Crop Protection",
+      "type": "Mainboard",
+      "price_band": "₹259 - ₹272",
+      "price_upper": 272.0,
+      "gmp_rs": 14.0,
+      "gmp_percent": 5.15,
+      "date_range": "20 Nov 2026",
+      "start_date": "20 Nov 2026",
+      "last_filing_date": "20 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "₹286 (+5.15%)"
     },
     {
       "name": "Mahanadi Coalfields",
       "type": "Mainboard",
       "price_band": "₹129 - ₹136",
       "price_upper": 136.0,
-      "gmp_rs": 2.0,
-      "gmp_percent": 1.47,
+      "gmp_rs": 1.0,
+      "gmp_percent": 0.74,
       "date_range": "20 Nov 2026",
       "start_date": "20 Nov 2026",
       "last_filing_date": "20 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹138 (+1.47%)"
+      "est_listing": "₹137 (+0.74%)"
     },
     {
       "name": "Watrana Rentals",
@@ -63,6 +77,20 @@
       "price_band": "₹0",
       "price_upper": 0.0,
       "gmp_rs": 12.0,
+      "gmp_percent": 0.0,
+      "date_range": "20 Nov 2026",
+      "start_date": "20 Nov 2026",
+      "last_filing_date": "20 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "—"
+    },
+    {
+      "name": "Integris Medtech",
+      "type": "Mainboard",
+      "price_band": "₹0",
+      "price_upper": 0.0,
+      "gmp_rs": 0.0,
       "gmp_percent": 0.0,
       "date_range": "20 Nov 2026",
       "start_date": "20 Nov 2026",
