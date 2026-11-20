@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-19T16:30:53.648527+00:00",
+  "_cached_at": "2026-11-20T02:30:46.315373+00:00",
   "data": [
     {
       "name": "Shree Siddhivinayak Greentech Industries",
@@ -11,8 +11,8 @@
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹142"
     },
     {
@@ -25,8 +25,8 @@
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹289 (+6.25%)"
     },
     {
@@ -39,8 +39,8 @@
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹138 (+1.47%)"
     },
     {
@@ -53,8 +53,8 @@
       "date_range": "19 Nov 2026",
       "start_date": "19 Nov 2026",
       "last_filing_date": "19 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹312 (+27.35%)"
     }
   ]
