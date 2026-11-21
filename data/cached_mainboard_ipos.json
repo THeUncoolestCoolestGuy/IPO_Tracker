@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-21T02:30:47.427777+00:00",
+  "_cached_at": "2026-11-21T07:00:49.404843+00:00",
   "data": [
     {
       "name": "Monomark Engineering",
@@ -22,11 +22,11 @@
       "price_upper": 272.0,
       "gmp_rs": 14.0,
       "gmp_percent": 5.15,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹286 (+5.15%)"
     },
     {
@@ -36,11 +36,11 @@
       "price_upper": 136.0,
       "gmp_rs": 1.0,
       "gmp_percent": 0.74,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹137 (+0.74%)"
     },
     {
@@ -50,11 +50,11 @@
       "price_upper": 245.0,
       "gmp_rs": 67.0,
       "gmp_percent": 27.35,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹312 (+27.35%)"
     },
     {
@@ -64,11 +64,11 @@
       "price_upper": 142.0,
       "gmp_rs": 0.0,
       "gmp_percent": 0.0,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "₹142"
     },
     {
@@ -78,11 +78,11 @@
       "price_upper": 0.0,
       "gmp_rs": 12.0,
       "gmp_percent": 0.0,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "—"
     },
     {
@@ -92,11 +92,11 @@
       "price_upper": 0.0,
       "gmp_rs": 0.0,
       "gmp_percent": 0.0,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
       "est_listing": "—"
     }
   ]
