@@ -1,20 +1,6 @@
 {
-  "_cached_at": "2026-11-21T07:00:49.404843+00:00",
+  "_cached_at": "2026-11-21T16:30:47.786367+00:00",
   "data": [
-    {
-      "name": "Monomark Engineering",
-      "type": "Mainboard",
-      "price_band": "₹0",
-      "price_upper": 0.0,
-      "gmp_rs": 0.0,
-      "gmp_percent": 0.0,
-      "date_range": "20 Nov 2026",
-      "start_date": "20 Nov 2026",
-      "last_filing_date": "20 Nov 2026",
-      "closing_today": false,
-      "status": "Closed",
-      "est_listing": "—"
-    },
     {
       "name": "Crystal Crop Protection",
       "type": "Mainboard",
@@ -34,28 +20,28 @@
       "type": "Mainboard",
       "price_band": "₹129 - ₹136",
       "price_upper": 136.0,
-      "gmp_rs": 1.0,
-      "gmp_percent": 0.74,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹137 (+0.74%)"
+      "est_listing": "₹136"
     },
     {
       "name": "Watrana Rentals",
       "type": "Mainboard",
       "price_band": "₹232 - ₹245",
       "price_upper": 245.0,
-      "gmp_rs": 67.0,
-      "gmp_percent": 27.35,
+      "gmp_rs": 65.0,
+      "gmp_percent": 26.53,
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
       "closing_today": true,
       "status": "Open",
-      "est_listing": "₹312 (+27.35%)"
+      "est_listing": "₹310 (+26.53%)"
     },
     {
       "name": "Shree Siddhivinayak Greentech Industries",
@@ -87,6 +73,20 @@
     },
     {
       "name": "Integris Medtech",
+      "type": "Mainboard",
+      "price_band": "₹0",
+      "price_upper": 0.0,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
+      "date_range": "21 Nov 2026",
+      "start_date": "21 Nov 2026",
+      "last_filing_date": "21 Nov 2026",
+      "closing_today": true,
+      "status": "Open",
+      "est_listing": "—"
+    },
+    {
+      "name": "Monomark Engineering",
       "type": "Mainboard",
       "price_band": "₹0",
       "price_upper": 0.0,
