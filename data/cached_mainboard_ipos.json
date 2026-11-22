@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-21T16:30:47.786367+00:00",
+  "_cached_at": "2026-11-22T02:30:45.965879+00:00",
   "data": [
     {
       "name": "Crystal Crop Protection",
@@ -11,8 +11,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹286 (+5.15%)"
     },
     {
@@ -25,8 +25,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹136"
     },
     {
@@ -39,8 +39,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹310 (+26.53%)"
     },
     {
@@ -53,8 +53,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "₹142"
     },
     {
@@ -67,8 +67,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "—"
     },
     {
@@ -81,8 +81,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "—"
     },
     {
@@ -95,8 +95,8 @@
       "date_range": "21 Nov 2026",
       "start_date": "21 Nov 2026",
       "last_filing_date": "21 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "—"
     }
   ]
