@@ -1,20 +1,6 @@
 {
-  "_cached_at": "2026-11-25T16:30:53.252665+00:00",
+  "_cached_at": "2026-11-26T02:30:52.088866+00:00",
   "data": [
-    {
-      "name": "Crystal Crop Protection",
-      "type": "Mainboard",
-      "price_band": "₹259 - ₹272",
-      "price_upper": 272.0,
-      "gmp_rs": 18.0,
-      "gmp_percent": 6.62,
-      "date_range": "25 Nov 2026",
-      "start_date": "25 Nov 2026",
-      "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
-      "est_listing": "18 Nov - 20 Nov"
-    },
     {
       "name": "Mahanadi Coalfields",
       "type": "Mainboard",
@@ -25,8 +11,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "19 Nov - 23 Nov"
     },
     {
@@ -39,8 +25,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "19 Nov - 23 Nov"
     },
     {
@@ -53,8 +39,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "25 Nov - 27 Nov"
     },
     {
@@ -67,8 +53,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "26 Nov - 30 Nov"
     },
     {
@@ -81,8 +67,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "27 Nov - 1 Dec"
     },
     {
@@ -95,8 +81,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "27 Nov - 1 Dec"
     },
     {
@@ -109,8 +95,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "1 Dec - 3 Dec"
     },
     {
@@ -123,8 +109,8 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "1 Dec - 3 Dec"
     },
     {
@@ -137,9 +123,23 @@
       "date_range": "25 Nov 2026",
       "start_date": "25 Nov 2026",
       "last_filing_date": "25 Nov 2026",
-      "closing_today": true,
-      "status": "Open",
+      "closing_today": false,
+      "status": "Closed",
       "est_listing": "2 Dec - 4 Dec"
+    },
+    {
+      "name": "Encube Ethicals",
+      "type": "Mainboard",
+      "price_band": "₹0",
+      "price_upper": 0.0,
+      "gmp_rs": 0.0,
+      "gmp_percent": 0.0,
+      "date_range": "25 Nov 2026",
+      "start_date": "25 Nov 2026",
+      "last_filing_date": "25 Nov 2026",
+      "closing_today": false,
+      "status": "Closed",
+      "est_listing": "3 Dec - 7 Dec"
     }
   ]
 }
