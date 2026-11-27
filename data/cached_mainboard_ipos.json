@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-27T02:30:45.045477+00:00",
+  "_cached_at": "2026-11-27T07:01:04.152873+00:00",
   "data": [
     {
       "name": "Integris Medtech",
@@ -88,8 +88,8 @@
     {
       "name": "Swara Baby Products",
       "type": "Mainboard",
-      "price_band": "₹0",
-      "price_upper": 0.0,
+      "price_band": "₹105 - ₹111",
+      "price_upper": 111.0,
       "gmp_rs": 0.0,
       "gmp_percent": 0.0,
       "date_range": "27 Nov 2026",
@@ -116,8 +116,8 @@
     {
       "name": "Vishwas Refoils & Consumer",
       "type": "Mainboard",
-      "price_band": "₹0",
-      "price_upper": 0.0,
+      "price_band": "₹85 - ₹90",
+      "price_upper": 90.0,
       "gmp_rs": 0.0,
       "gmp_percent": 0.0,
       "date_range": "27 Nov 2026",
