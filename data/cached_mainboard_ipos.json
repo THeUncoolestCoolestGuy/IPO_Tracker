@@ -1,5 +1,5 @@
 {
-  "_cached_at": "2026-11-28T07:00:47.964388+00:00",
+  "_cached_at": "2026-11-28T16:30:49.400467+00:00",
   "data": [
     {
       "name": "Integris Medtech",
@@ -34,8 +34,8 @@
       "type": "Mainboard",
       "price_band": "₹181 - ₹191",
       "price_upper": 191.0,
-      "gmp_rs": 4.0,
-      "gmp_percent": 2.09,
+      "gmp_rs": 3.0,
+      "gmp_percent": 1.57,
       "date_range": "28 Nov 2026",
       "start_date": "28 Nov 2026",
       "last_filing_date": "28 Nov 2026",
@@ -76,8 +76,8 @@
       "type": "Mainboard",
       "price_band": "₹163 - ₹172",
       "price_upper": 172.0,
-      "gmp_rs": 31.0,
-      "gmp_percent": 18.02,
+      "gmp_rs": 30.0,
+      "gmp_percent": 17.44,
       "date_range": "28 Nov 2026",
       "start_date": "28 Nov 2026",
       "last_filing_date": "28 Nov 2026",
